@@ -14,9 +14,23 @@ int min(int a, int b)
 	return a < b ? a : b;
 }
 
+void printDPTable(vector<vector<int>>& T)
+{
+	for (auto a : T)
+	{
+		for (auto b : a)
+		{
+			cout << b << "\t";
+		}
+		cout << '\n' << endl;
+	}
+	cout << '\n';
+}
+
 #pragma region DP
 #pragma region Stock Trade
 
+// 121
 int maxProfitForKEquals1(vector<int>& prices)
 {
 	if (prices.size() == 0) return 0;
@@ -32,6 +46,7 @@ int maxProfitForKEquals1(vector<int>& prices)
 	return T_i0;
 }
 
+// 123
 int maxProfitForKEquals2(vector<int>& prices)
 {
 	if (prices.size() == 0) return 0;
@@ -67,6 +82,7 @@ int maxProfitForKInfinity(vector<int>& prices)
 	return T_ik0;
 }
 
+// 188
 int maxProfitForKArbitrary(int k, vector<int>& prices)
 {
 	if (k >= prices.size() >> 1)
@@ -89,6 +105,7 @@ int maxProfitForKArbitrary(int k, vector<int>& prices)
 	return T_ik0[k];
 }
 
+// 309
 int maxProfitForCooldown(vector<int>& prices)
 {
 	if (prices.size() == 0) return 0;
@@ -109,6 +126,7 @@ int maxProfitForCooldown(vector<int>& prices)
 	return T_ik0;
 }
 
+// 714
 int maxProfitWithFee(vector<int>& prices, int fee)
 {
 	if (prices.size() == 0) return 0;
@@ -126,6 +144,7 @@ int maxProfitWithFee(vector<int>& prices, int fee)
 
 #pragma endregion
 
+// 5
 string longestPalindrome(string s)
 {
 	int len = s.size();
@@ -160,7 +179,8 @@ string longestPalindrome(string s)
 	return s.substr(start, maxDis + 1);
 }
 
-int CoinChange1(vector<int>& coins, int amount)
+// 322
+int coinChange(vector<int>& coins, int amount)
 {
 	vector<int> T(amount + 1, amount + 1);
 	T[0] = 0;
@@ -175,6 +195,7 @@ int CoinChange1(vector<int>& coins, int amount)
 	return T[amount] > amount ? -1 : T[amount];
 }
 
+// 53
 int maxSubArray(vector<int>& nums)
 {
 	int length = nums.size();
@@ -190,6 +211,7 @@ int maxSubArray(vector<int>& nums)
 	return m;
 }
 
+// 70
 int climbStairs(int n)
 {
 	if (n == 0) return 0;
@@ -208,6 +230,7 @@ int climbStairs(int n)
 	return target;
 }
 
+// 198
 int rob(vector<int>& nums)
 {
 	int len = nums.size();
@@ -226,6 +249,7 @@ int rob(vector<int>& nums)
 	return T[len - 1];
 }
 
+// 392
 bool isSubsequence(string s, string t)
 {
 	int index = 0;
@@ -239,6 +263,7 @@ bool isSubsequence(string s, string t)
 	return index == s.size() ? true : false;
 }
 
+// 62
 int uniquePaths1(int m, int n)
 {
 	vector<vector<int>> T(m, vector<int>(n, 1));
@@ -254,6 +279,7 @@ int uniquePaths1(int m, int n)
 	return T[m - 1][n - 1];
 }
 
+// 63
 int uniquePaths2(vector<vector<int>>& obstacleGrid)
 {
 	int m = obstacleGrid.size(), n = obstacleGrid[0].size();
@@ -272,6 +298,7 @@ int uniquePaths2(vector<vector<int>>& obstacleGrid)
 	return T[m][n];
 }
 
+// 64
 int minPathSum(vector<vector<int>>& grid)
 {
 	int m = grid.size(), n = grid[0].size();
@@ -289,6 +316,7 @@ int minPathSum(vector<vector<int>>& grid)
 	return T[m][n];
 }
 
+// 96
 int numTrees(int n)
 {
 	if (n == 1) return 1;
@@ -309,6 +337,7 @@ int numTrees(int n)
 	return T[n];
 }
 
+// 120
 int minimumTotal(vector<vector<int>>& triangle)
 {
 	vector<vector<int>> T(triangle);
@@ -342,6 +371,7 @@ int minimumTotal(vector<vector<int>>& triangle)
 	return min;
 }
 
+// 221
 int maximalSquare(vector<vector<int>>& matrix)
 {
 	if (matrix.empty()) return 0;
@@ -365,6 +395,7 @@ int maximalSquare(vector<vector<int>>& matrix)
 	return size * size;
 }
 
+// 264
 int nthUglyNumber(int n)
 {
 	if (n == 0) return 0;
@@ -389,6 +420,7 @@ int nthUglyNumber(int n)
 	return T[n - 1];
 }
 
+// 139
 bool wordBreak(string s, vector<string>& wordDict)
 {
 	if (wordDict.empty()) return false;
@@ -415,6 +447,7 @@ bool wordBreak(string s, vector<string>& wordDict)
 	return T[s.size()];
 }
 
+// 1143
 int longestCommonSubsequence(string text1, string text2)
 {
 	vector<vector<int>> T(text1.size(), vector<int>(text2.size(), 0));
@@ -440,6 +473,7 @@ int longestCommonSubsequence(string text1, string text2)
 	return T[text1.size() - 1][text2.size() - 1];
 }
 
+// 718
 int findLength(vector<int>& A, vector<int>& B)
 {
 	vector<vector<int>> T(A.size() + 1, vector<int>(B.size() + 1, 0));
@@ -456,6 +490,7 @@ int findLength(vector<int>& A, vector<int>& B)
 	return res;
 }
 
+// 300
 int lengthOfLIS(vector<int>& nums)
 {
 	if (nums.empty()) return 0;
@@ -477,23 +512,52 @@ int lengthOfLIS(vector<int>& nums)
 	return res;
 }
 
-//for (auto a : T)
-//{
-//	for (auto b : a)
-//	{
-//		cout << b << "\t";
-//	}
-//	cout << '\n' << endl;
-//}
-//cout << '\n';
+// 312
+int maxCoins(vector<int>& nums)
+{
+	int n = nums.size();
+	nums.insert(nums.begin(), 1);
+	nums.push_back(1);
+
+	vector<vector<int>> T(n + 2, vector<int>(n + 2, 0));
+
+	for (int len = 1; len <= n; ++len)
+	{
+		for (int left = 1; left <= n - len + 1; ++left)
+		{
+			int right = left + len - 1;
+			for (int k = left; k <= right; ++k)
+			{
+				T[left][right] = max(T[left][right], T[left][k - 1] + (nums[left - 1] * nums[k] * nums[right + 1]) + T[k + 1][right]);
+			}
+		}
+	}
+
+	return T[1][n];
+}
 
 #pragma endregion
+
+
+// 48
+void rotate(vector<vector<int>>& matrix)
+{
+	reverse(matrix.begin(), matrix.end());
+
+	for (int i = 0; i < matrix.size(); ++i)
+	{
+		for (int j = i + 1; j < matrix[i].size(); ++j)
+		{
+			swap(matrix[i][j], matrix[j][i]);
+		}
+	}
+}
 
 void main()
 {
 	vector<int> a = { 1,3,6,7,9,4,10,5,6 };
-	vector<int> a1 = { 3,2,1,4,7 };
+	vector<int> a1 = { 3,1,5,8 };
 	vector<vector<int>> b{ {1} };
 	vector<string> c{ "Leet", "Code" };
-	cout << lengthOfLIS(a) << endl;
+	cout << longestPalindrome(string("aaaa")) << endl;
 }

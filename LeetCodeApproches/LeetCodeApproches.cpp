@@ -2,7 +2,18 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <numeric>
+#include <algorithm>
 using namespace std;
+
+struct ListNode 
+{
+	int val;
+	ListNode *next;
+	ListNode() : val(0), next(nullptr) {}
+	ListNode(int x) : val(x), next(nullptr) {}
+	ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
 
 int max(int a, int b)
 {
@@ -15,6 +26,19 @@ int min(int a, int b)
 }
 
 void printDPTable(vector<vector<int>>& T)
+{
+	for (auto a : T)
+	{
+		for (auto b : a)
+		{
+			cout << b << "\t";
+		}
+		cout << '\n' << endl;
+	}
+	cout << '\n';
+}
+
+void printDPTable(vector<vector<bool>>& T)
 {
 	for (auto a : T)
 	{
@@ -536,8 +560,112 @@ int maxCoins(vector<int>& nums)
 	return T[1][n];
 }
 
+// 698
+class Solution {
+public:
+	// use global variables to avoid long parameter list
+	int target; // of each bucket
+	vector< int > ns;
+	vector< int > bucket;
+
+	//bool canPartitionKSubsets(vector<int>& nums, int k) {
+	//	int sum = 0;
+	//	for (int &n : nums) sum += n;
+	//	if (sum % k) return false; // not divisible
+	//	target = sum / k;
+	//	ns = vector< int >(nums);
+	//	bucket = vector< int >(k, 0);
+	//	// starting with bigger ones makes it faster
+	//	sort(ns.begin(), ns.end(), greater<int>());
+	//	//reverse(ns.begin(), ns.end());
+	//	return put(0);
+	//}
+
+	//// put #n item of ns into some bucket to meet target
+	//bool put(int n) {
+	//	for (int i = 0; i < bucket.size(); ++i) {
+	//		if (bucket[i] + ns[n] > target) continue; // try next bucket
+	//		bucket[i] += ns[n]; // put it in!
+	//		if (n == ns.size() - 1) return true; // all items in bucket, no overflow
+	//		if (put(n + 1)) return true; // move on to next item
+	//		else { // no solution = wrong bucket
+	//			bucket[i] -= ns[n]; // take it out
+	//			if (bucket[i] == 0) return false; // no need to try other empty bucket
+	//		}
+	//	}
+	//	return false; // no bucket fits
+	//}
+
+	bool canPartitionKSubsets(vector<int>& nums, int k) {
+		const int sum = accumulate(nums.begin(), nums.end(), 0);
+		if (sum%k != 0) return false;
+		sort(nums.rbegin(), nums.rend());
+		return dfs(nums, sum / k, 0, k, 0);
+	}
+
+	bool dfs(const vector<int>&nums, int target, int cur, int k, int used) {
+		if (k == 0) return used == (1 << nums.size()) - 1;
+		for (int i = 0; i < nums.size(); i++) {
+			if (used&(1 << i)) continue;
+			int t = cur + nums[i];
+			if (t > target) break;
+			int new_used = used | (1 << i);
+			if (t == target && dfs(nums, target, 0, k - 1, new_used)) return true;
+			else if (dfs(nums, target, t, k, new_used)) return true;
+		}
+		return false;
+	}
+};
+
 #pragma endregion
 
+#pragma region Array
+
+// 2
+ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
+{
+	ListNode target(0), *p = &target;
+	int extra = 0;
+
+	while (l1 || l2 || extra)
+	{
+		if (l1) { extra += l1->val; l1 = l1->next; }
+		if (l2) { extra += l2->val; l2 = l2->next; }
+
+		p->next = new ListNode(extra % 10);
+		p = p->next;
+
+		extra /= 10;
+	}
+
+	return target.next;
+}
+
+// 4
+double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
+{
+	int const len1 = nums1.size(), len2 = nums2.size();
+	int n1 = 0, n2 = 0, n = 0;
+	vector<int> newNums(len1 + len2, 0);
+
+	while (n1 < len1 || n2 < len2)
+	{
+		if (n1 >= len1) { newNums[n++] = (nums2[n2++]); continue; }
+		if (n2 >= len2) { newNums[n++] = (nums1[n1++]); continue; }
+
+		if (nums2[n2] >= nums1[n1])
+			newNums[n++] = (nums1[n1++]);
+		else
+			newNums[n++] = (nums2[n2++]);
+	}
+
+	if ((len1 + len2) % 2 == 1)
+		return newNums[(len1 + len2) / 2];
+	else
+		return (double)(newNums[(len1 + len2) / 2 - 1] + newNums[(len1 + len2) / 2]) / 2;
+}
+
+#pragma endregion
 
 // 48
 void rotate(vector<vector<int>>& matrix)
@@ -555,9 +683,11 @@ void rotate(vector<vector<int>>& matrix)
 
 void main()
 {
-	vector<int> a = { 1,3,6,7,9,4,10,5,6 };
-	vector<int> a1 = { 3,1,5,8 };
+	vector<int> a = { 1,2 };
+	vector<int> a1 = { 3,4 };
 	vector<vector<int>> b{ {1} };
 	vector<string> c{ "Leet", "Code" };
-	cout << longestPalindrome(string("aaaa")) << endl;
+
+	cout << findMedianSortedArrays(a, a1) << endl;
+
 }

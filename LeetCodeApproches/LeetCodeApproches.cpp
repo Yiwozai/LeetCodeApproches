@@ -4,7 +4,11 @@
 #include <math.h>
 #include <numeric>
 #include <algorithm>
+#include <map>
+#include "Eigen/Core"
+#include "Eigen/Dense"
 using namespace std;
+using namespace Eigen;
 
 struct ListNode 
 {
@@ -15,14 +19,24 @@ struct ListNode
 	ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
-int max(int a, int b)
+struct TreeNode {
+	int val;
+	TreeNode *left;
+	TreeNode *right;
+	TreeNode() : val(0), left(nullptr), right(nullptr) {}
+	TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+	TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+	
+};
+
+static int max(int a, int b)
 {
 	return a >= b ? a : b;
 }
 
-int min(int a, int b)
+static int min(int a, int b)
 {
-	return a < b ? a : b;
+	return a <= b ? a : b;
 }
 
 void printDPTable(vector<vector<int>>& T)
@@ -49,6 +63,22 @@ void printDPTable(vector<vector<bool>>& T)
 		cout << '\n' << endl;
 	}
 	cout << '\n';
+}
+
+int binarySearch(vector<int>& nums, int target)
+{
+	int left = 0, right = nums.size() - 1, length = nums.size();
+	int mid;
+
+	while (left <= right)
+	{
+		mid = (left + right) / 2;
+		if (nums[mid] == target) return mid;
+		else if (nums[mid] < target) left = mid + 1;
+		else if (nums[mid] > target) right = mid - 1;
+	}
+
+	return -1;
 }
 
 #pragma region DP
@@ -200,6 +230,8 @@ string longestPalindrome(string s)
 		}
 	}
 
+	printDPTable(T);
+
 	return s.substr(start, maxDis + 1);
 }
 
@@ -338,27 +370,6 @@ int minPathSum(vector<vector<int>>& grid)
 	}
 
 	return T[m][n];
-}
-
-// 96
-int numTrees(int n)
-{
-	if (n == 1) return 1;
-	if (n == 2) return 2;
-
-	vector<int> T(n + 1, 0);
-	T[0] = T[1] = 1;
-	T[2] = 2;
-
-	for (int i = 3; i <= n; ++i)
-	{
-		for (int j = 0; j < i; ++j)
-		{
-			T[i] += T[j] * T[i - j - 1];
-		}
-	}
-
-	return T[n];
 }
 
 // 120
@@ -667,6 +678,81 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
 
 #pragma endregion
 
+#pragma region Two Pointers
+
+// 3
+int lengthOfLongestSubstring(string s)
+{
+	map<char, int> map;
+	int start = -1, maxLen = 0;
+
+	for (int i = 0; i < s.size(); ++i)
+	{
+		if (map.count(s[i]) != 0)
+			start = max(start, map[s[i]]);
+
+		map[s[i]] = i;
+		maxLen = max(maxLen, i - start);
+	}
+
+	return maxLen;
+}
+
+#pragma endregion
+
+#pragma region Tree
+
+// 94
+//vector<int> inorderTraversal(TreeNode* root)
+//{
+//	if (root)
+//	{
+//		inorderTraversal(root->left);
+//		cout << root->val << endl;
+//		inorderTraversal(root->right);
+//	}
+//}
+
+// 96
+int numTrees(int n)
+{
+	if (n == 1) return 1;
+	if (n == 2) return 2;
+
+	vector<int> T(n + 1, 0);
+	T[0] = T[1] = 1;
+	T[2] = 2;
+
+	for (int i = 3; i <= n; ++i)
+	{
+		for (int j = 0; j < i; ++j)
+		{
+			T[i] += T[j] * T[i - j - 1];
+		}
+	}
+
+	return T[n];
+}
+
+
+#pragma endregion
+
+
+#pragma region LinkedLists
+
+// 23
+ListNode* mergeKLists(vector<ListNode*>& lists) 
+{
+	if (lists.empty()) return nullptr;
+	if (lists.size() == 1) return lists[0];
+}
+ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
+{
+	return nullptr;
+}
+
+#pragma endregion
+
 // 48
 void rotate(vector<vector<int>>& matrix)
 {
@@ -683,11 +769,17 @@ void rotate(vector<vector<int>>& matrix)
 
 void main()
 {
-	vector<int> a = { 1,2 };
-	vector<int> a1 = { 3,4 };
-	vector<vector<int>> b{ {1} };
-	vector<string> c{ "Leet", "Code" };
+	//vector<int> a = { 1,2 ,3,4,5};
+	//vector<int> a1 = { 3,4 };
+	//vector<vector<int>> b{ {1} };
+	//vector<string> c{ "Leet", "Code" };
 
-	cout << findMedianSortedArrays(a, a1) << endl;
+	Vector3f a{ 1, 2, 1 };
+	Vector3f b{ 1, 0, 1 };
+
+	a = a.normalized();
+	b = b.normalized();
+
+	cout <<  a.dot(b) << endl;
 
 }

@@ -536,8 +536,17 @@ int maxCoins(vector<int>& nums)
 	return T[1][n];
 }
 
+// 898
+class Solution {
+public:
+	int subarrayBitwiseORs(vector<int>& arr) {
+
+	}
+};
+
 #pragma endregion
 
+#pragma region Math
 
 // 48
 void rotate(vector<vector<int>>& matrix)
@@ -552,6 +561,8 @@ void rotate(vector<vector<int>>& matrix)
 		}
 	}
 }
+
+#pragma endregion
 
 void main()
 {

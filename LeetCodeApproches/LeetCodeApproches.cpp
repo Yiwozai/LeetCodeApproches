@@ -569,12 +569,10 @@ int maxCoins(vector<int>& nums)
 }
 
 // 898
-class Solution {
-public:
-	int subarrayBitwiseORs(vector<int>& arr) {
-
-	}
-};
+int subarrayBitwiseORs(vector<int>& arr) 
+{
+	return 0;
+}
 
 // 698
 class Solution {
@@ -774,10 +772,28 @@ void rotate(vector<vector<int>>& matrix)
 
 #pragma endregion
 
+int CurrentProblem(int n)
+{
+	if (n <= 0) return 0;
+	else if (n == 1) return 1;
+
+	vector<int> DP(n + 1, 0);
+	DP[1] = 1;
+
+	for (int i = 2; i <= n; ++i)
+	{
+		DP[i] = DP[i - 1] + DP[i - 2];
+	}
+
+	return DP[n];
+}
+
 void main()
 {
 	//vector<int> a = { 1,2 ,3,4,5};
 	//vector<int> a1 = { 3,4 };
 	//vector<vector<int>> b{ {1} };
 	//vector<string> c{ "Leet", "Code" };
+
+	cout << CurrentProblem(5) << endl;
 }

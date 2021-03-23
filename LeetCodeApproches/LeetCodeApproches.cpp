@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <vector>
+#include <queue>
 #include <math.h>
 #include <numeric>
 #include <algorithm>
@@ -36,7 +37,17 @@ static int min(int a, int b)
 	return a <= b ? a : b;
 }
 
-void printDPTable(vector<vector<int>>& T)
+void printVectorString(vector<string>&& S)
+{
+	for (auto s : S)
+	{
+		cout << s << endl;
+	}
+
+	cout << '\n' << endl;
+}
+
+void printDPTable(vector<vector<int>>&& T)
 {
 	for (auto a : T)
 	{
@@ -51,8 +62,19 @@ void printDPTable(vector<vector<int>>& T)
 
 void printDPTable(vector<vector<bool>>& T)
 {
+	int len = T[0].size();
+
+	cout << "\t";
+	for (int i = 0; i < len; ++i)
+		cout << i << "\t";
+	cout << '\n' << endl;
+
+	int col = 0;
 	for (auto a : T)
 	{
+		cout << col << "\t";
+		++col;
+
 		for (auto b : a)
 		{
 			cout << b << "\t";
@@ -224,12 +246,51 @@ string longestPalindrome(string s)
 				start = i;
 				maxDis = dis;
 			}
+
+			cout << i << "   " << i + dis << endl;
+			printDPTable(T);
+		}
+	}
+
+	cout << "The last: " << endl;
+	printDPTable(T);
+
+	return s.substr(start, maxDis + 1);
+}
+
+string longestPalindrome2(string s)
+{
+	int len = s.size();
+	if (len <= 1) return s;
+
+	vector<vector<bool>> T(len, vector<bool>(len, false));
+	for (int i = 0; i < len; ++i)
+		T[i][i] = true;
+
+	int start = 0, maxLen = 0;
+	for (int l = 1; l < len; ++l)
+	{
+		for (int i = 0; i < len - l; ++i)
+		{
+			if (l == 1)
+				T[i][i + l] = s[i] == s[i + l];
+			else
+				T[i][i + l] = (s[i] == s[i + l] && T[i + 1][i + l - 1]);
+
+			if (T[i][i + l])
+			{
+				start = i;
+				maxLen = l;
+				cout << s.substr(start, maxLen + 1) << endl;
+			}
+
+			cout << i << "   " << i + l << endl;
+			printDPTable(T);
 		}
 	}
 
 	printDPTable(T);
-
-	return s.substr(start, maxDis + 1);
+	return s.substr(start, maxLen + 1);
 }
 
 // 322
@@ -253,7 +314,7 @@ int maxSubArray(vector<int>& nums)
 {
 	int length = nums.size();
 	vector<int> T(length, 0);
-	int m = T[0];
+	int m = T[0] = nums[0];
 
 	for (int i = 1; i < length; ++i)
 	{
@@ -482,27 +543,21 @@ bool wordBreak(string s, vector<string>& wordDict)
 // 1143
 int longestCommonSubsequence(string text1, string text2)
 {
-	vector<vector<int>> T(text1.size(), vector<int>(text2.size(), 0));
-	T[0][0] = text1[0] == text2[0];
+	int n = text1.size(), m = text2.size();
+	vector<vector<int>> T(n + 1, vector<int>(m + 1, 0));
 
-	for (int i = 0; i < text1.size(); ++i)
+	for (int i = 1; i <= n; ++i)
 	{
-		for (int j = 0; j < text2.size(); ++j)
+		for (int j = 1; j <= m; ++j)
 		{
-			if (i == 0 && j == 0) continue;
-
-			if (i == 0)
-				T[i][j] = T[i][j - 1] | text1[i] == text2[j];
-			else if (j == 0)
-				T[i][j] = T[i - 1][j] | text1[i] == text2[j];
-			else if (text1[i] != text2[j])
-				T[i][j] = max(T[i - 1][j], T[i][j - 1]);
-			else
+			if (text1[i - 1] == text2[j - 1])
 				T[i][j] = T[i - 1][j - 1] + 1;
+			else
+				T[i][j] = max(T[i - 1][j], T[i][j - 1]);
 		}
 	}
 
-	return T[text1.size() - 1][text2.size() - 1];
+	return T[n][m];
 }
 
 // 718
@@ -527,7 +582,6 @@ int lengthOfLIS(vector<int>& nums)
 {
 	if (nums.empty()) return 0;
 	vector<int> T(nums.size(), 1);
-	int res = 1;
 
 	for (int i = 1; i < nums.size(); ++i)
 	{
@@ -538,10 +592,7 @@ int lengthOfLIS(vector<int>& nums)
 		}
 	}
 
-	for (auto i : T)
-		res = max(res, i);
-
-	return res;
+	return *max_element(T.begin(), T.end());
 }
 
 // 312
@@ -631,6 +682,28 @@ public:
 	}
 };
 
+// 72
+int MinDistance(string word1, string word2)
+{
+	int m = word1.size(), n = word2.size();
+	vector<vector<int>> T(m + 1, vector<int>(n + 1, 0));
+	for (int i = 1; i <= m; ++i) T[i][0] = i;
+	for (int i = 1; i <= n; ++i) T[0][i] = i;
+
+	for (int i = 1; i <= m; ++i)
+	{
+		for (int j = 1; j <= n; ++j)
+		{
+			if (word1[i - 1] == word2[j - 1])
+				T[i][j] = T[i - 1][j - 1];
+			else
+				T[i][j] = min(min(T[i - 1][j - 1], T[i - 1][j]), T[i][j - 1]) + 1;
+		}
+	}
+
+	return T[m][n];
+}
+
 #pragma endregion
 
 #pragma region Array
@@ -701,6 +774,25 @@ int lengthOfLongestSubstring(string s)
 	return maxLen;
 }
 
+// 11
+int maxArea(vector<int>& height)
+{
+	int l = 0, r = height.size() - 1;
+	int res = 0;
+
+	while (l < r)
+	{
+		res = max(res, min(height[l], height[r]) * (r - l));
+
+		if (height[l] > height[r])
+			--r;
+		else
+			++l;
+	}
+
+	return res;
+}
+
 #pragma endregion
 
 #pragma region Tree
@@ -719,23 +811,160 @@ int lengthOfLongestSubstring(string s)
 // 96
 int numTrees(int n)
 {
-	if (n == 1) return 1;
-	if (n == 2) return 2;
-
 	vector<int> T(n + 1, 0);
 	T[0] = T[1] = 1;
-	T[2] = 2;
 
-	for (int i = 3; i <= n; ++i)
+	for (int i = 2; i <= n; ++i)
 	{
-		for (int j = 0; j < i; ++j)
+		for (int j = 1; j <= i; ++j)
 		{
-			T[i] += T[j] * T[i - j - 1];
+			T[i] += T[j - 1] * T[i - j];
 		}
 	}
 
 	return T[n];
 }
+
+// 102
+vector<vector<int>> levelOrder(TreeNode* root)
+{
+	vector<vector<int>> res(0);
+	queue<TreeNode*> q;
+	q.push(root);
+
+	while (!q.empty())
+	{
+		int n = q.size();
+		vector<int> curLevel;
+		curLevel.reserve(n);
+
+		for (int i = 0; i < n; ++i)
+		{
+			TreeNode* p = q.front();
+			q.pop();
+
+			if (p != nullptr)
+			{
+				curLevel.push_back(p->val);
+				q.push(p->left);
+				q.push(p->right);
+			}
+		}
+
+		if (curLevel.size() > 0)
+			res.push_back(move(curLevel));
+	}
+
+	return res;
+}
+
+#pragma endregion
+
+#pragma region DFS and Backtracking
+
+// 22
+class GenerateParenthesesSolution {
+public:
+	vector<string> generateParenthesis(int n) 
+	{
+		vector<string> res;
+		helper(res, "", n, n);
+		return res;
+	}
+
+	void helper(vector<string>& res, string&& s, int n, int m)
+	{
+		if (n == 0 && m == 0)
+		{
+			res.push_back(s);
+			return;
+		}
+
+		if (n > 0)
+			helper(res, s + '(', n - 1, m);
+
+		if (m > n)
+			helper(res, s + ')', n, m - 1);
+	}
+};
+
+// 37
+class SudokuSolverSolution {
+public:
+	void solveSudoku(vector<vector<char>>& board) 
+	{
+		_row = vector<vector<bool>>(9, vector<bool>(10, false));
+		_col = vector<vector<bool>>(9, vector<bool>(10, false));
+		_box = vector<vector<bool>>(9, vector<bool>(10, false));
+
+		for (int i = 0; i < 9; ++i)
+		{
+			for (int j = 0; j < 9; ++j)
+			{
+				if (board[i][j] != '.')
+				{
+					_col[i][board[i][j] - '0'] = true;
+					_row[j][board[i][j] - '0'] = true;
+					_box[i / 3 * 3 + j / 3][board[i][j] - '0'] = true;
+				}
+			}
+		}
+
+		fill(board, 0, 0);
+	}
+
+	void fill(vector<vector<char>>& board, int n, int m)
+	{
+
+	}
+
+private:
+	vector<vector<bool>> _row, _col, _box;
+};
+
+// 51
+class NQueensSolution {
+public:
+	vector<vector<string>> solveNQueens(int n) {
+
+	}
+};
+
+//for (int i = 0; i < n; ++i)
+//{
+//	if (!available()) continue;	// 剪枝
+//	put();	// 放置
+//	fill(); // 进入
+//	back(); // 回退
+//}
+
+// 79
+class WordSearchSolution {
+public:
+	bool exist(vector<vector<char>>& board, string word) 
+	{
+		int n = board.size(), m = board[0].size();
+		_map = vector<vector<bool>>(n + 1, vector<bool>(m + 1, false));
+
+		int index = 0;
+		find(0, 0, 0, board, word);
+	}
+
+	bool find(int x, int y, int index, vector<vector<char>>& board, string& word)
+	{
+		if (index >= word.size())
+			return true;
+
+
+		if (board[x][y] == word[index])
+		{
+
+		}
+	}
+
+private:
+	vector<vector<bool>> _map;
+};
 
 #pragma endregion
 
@@ -772,28 +1001,28 @@ void rotate(vector<vector<int>>& matrix)
 
 #pragma endregion
 
-int CurrentProblem(int n)
+vector<string> CurrentProblem(int n)
 {
-	if (n <= 0) return 0;
-	else if (n == 1) return 1;
-
-	vector<int> DP(n + 1, 0);
-	DP[1] = 1;
-
-	for (int i = 2; i <= n; ++i)
-	{
-		DP[i] = DP[i - 1] + DP[i - 2];
-	}
-
-	return DP[n];
+	return GenerateParenthesesSolution().generateParenthesis(n);
 }
 
 void main()
 {
-	//vector<int> a = { 1,2 ,3,4,5};
-	//vector<int> a1 = { 3,4 };
-	//vector<vector<int>> b{ {1} };
-	//vector<string> c{ "Leet", "Code" };
+	vector<int> a = { 1,8,6,2,5,4,8,3,7 };
+	vector<int> a1 = { 3,4 };
+	vector<vector<int>> b{ {1} };
+	vector<string> c{ "Leet", "Code" };
+	string s1 = "a";
+	string s2 = "b";
 
-	cout << CurrentProblem(5) << endl;
+	TreeNode *root = &TreeNode(1);
+	root->left = &TreeNode(2);
+	root->right = &TreeNode(3);
+	root->left->left = &TreeNode(4);
+	root->left->right = &TreeNode(5);
+	root->right->left = &TreeNode(6);
+	root->right->right = &TreeNode(7);
+
+	//printVectorString(CurrentProblem(3));
+	cout << maxArea(a) << endl;
 }

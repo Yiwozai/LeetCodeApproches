@@ -5,6 +5,7 @@
 #include <math.h>
 #include <numeric>
 #include <algorithm>
+#include <unordered_map>
 #include <map>
 using namespace std;
 
@@ -706,7 +707,7 @@ int MinDistance(string word1, string word2)
 
 #pragma endregion
 
-#pragma region Array
+#pragma region Array and List
 
 // 2
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
@@ -750,6 +751,49 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
 		return newNums[(len1 + len2) / 2];
 	else
 		return (double)(newNums[(len1 + len2) / 2 - 1] + newNums[(len1 + len2) / 2]) / 2;
+}
+
+// 141
+bool hasCycle(ListNode *head) 
+{
+	ListNode *walker, *runner;
+	walker = runner = head;
+
+	while (walker != nullptr && runner != nullptr)
+	{
+		walker = walker->next;
+		runner = runner->next;
+		if (runner == nullptr) return false;
+		runner = runner->next;
+
+		if (walker == runner) return true;
+	}
+
+	return false;
+}
+
+// TODO
+// 142
+ListNode *detectCycle(ListNode *head) 
+{
+	ListNode *walker, *runner;
+	walker = runner = head;
+	bool isCycle = false;
+
+	while (walker != nullptr && runner != nullptr)
+	{
+		walker = walker->next;
+		runner = runner->next;
+		if (runner == nullptr) return nullptr;
+		runner = runner->next;
+
+		if (walker == runner)
+			isCycle = true;
+	}
+
+	if (isCycle == false) return nullptr;
+	
+	return nullptr;
 }
 
 #pragma endregion
@@ -796,19 +840,19 @@ int maxArea(vector<int>& height)
 // 42
 int trap(vector<int>& height)
 {
-	if (height.empty()) return;
+	if (height.size() < 3) return 0;
 
 	auto l = height.begin(), r = height.end() - 1;
-	int level = 0, res = 0;
+	int lower = 0, current = 0, result = 0;
 
 	while (l != r + 1)
 	{
-		int lower = *l > *r ? *l++ : *r--;
-		level = max(level, lower);
-		res += level - lower;
+		current = *l > *r ? *r-- : *l++;
+		lower = max(lower, current);
+		result += lower - current;
 	}
 
-	return res;
+	return result;
 }
 
 #pragma endregion
@@ -906,6 +950,7 @@ public:
 	}
 };
 
+// TODO
 // 37
 class SudokuSolverSolution {
 public:
@@ -940,6 +985,43 @@ private:
 	vector<vector<bool>> _row, _col, _box;
 };
 
+// 46
+class PermutationsSolution {
+public:
+	vector<vector<int>> permute(vector<int>& nums) 
+	{
+		for (auto i : nums)
+			map[i] = false;
+
+		fill(nums);
+
+		return res;
+	}
+
+	void fill(vector<int>& nums)
+	{
+		if (temp.size() == nums.size())
+			res.push_back(temp);
+
+		for (auto i : nums)
+		{
+			if (map[i]) continue;
+
+			map[i] = true;
+			temp.push_back(i);
+			fill(nums);
+			map[i] = false;
+			temp.pop_back();
+		}
+	}
+
+private:
+	vector<vector<int>> res;
+	vector<int> temp;
+	unordered_map<int, bool> map;
+};
+
+// TODO
 // 51
 class NQueensSolution {
 public:
@@ -961,27 +1043,94 @@ class WordSearchSolution {
 public:
 	bool exist(vector<vector<char>>& board, string word) 
 	{
-		int n = board.size(), m = board[0].size();
-		_map = vector<vector<bool>>(n + 1, vector<bool>(m + 1, false));
+		if (board.empty()) return false;
 
-		int index = 0;
-		find(0, 0, 0, board, word);
+		n = board.size(), m = board[0].size();
+
+		for (int i = 0; i < n; ++i)
+		{
+			for (int j = 0; j < m; ++j)
+			{
+				if (find(i, j, 0, board, word)) return true;
+			}
+		}
+
+		return false;
 	}
 
 	bool find(int x, int y, int index, vector<vector<char>>& board, string& word)
 	{
-		if (index >= word.size())
-			return true;
+		if (x < 0 || x >= n || y < 0 || y >= m || board[x][y] != word[index])
+			return false;
 
+		if (index == word.length() - 1) return true;
 
-		if (board[x][y] == word[index])
-		{
+		char cur = word[index];
+		board[x][y] = 0;
 
-		}
+		bool b = find(x - 1, y, index + 1, board, word)
+			|| find(x + 1, y, index + 1, board, word)
+			|| find(x, y - 1, index + 1, board, word)
+			|| find(x, y + 1, index + 1, board, word);
+
+		board[x][y] = cur;
+
+		return b;
 	}
 
 private:
-	vector<vector<bool>> _map;
+	int n, m;
+};
+
+// 526
+class BeautifulArrangementSolution {
+public:
+	int countArrangement(int n) 
+	{
+		for (int i = 1; i <= n; ++i)
+			map[i] = false;
+
+		fill(n);
+
+		return res;
+	}
+
+	void fill(int n)
+	{
+		if (temp.size() == n)
+		{
+			++res;
+			return;
+		}
+
+		for (int i = 1; i <= n; ++i)
+		{
+			if (map[i])
+				continue;
+
+			map[i] = true;
+			temp.push_back(i);
+			if (check()) fill(n);
+			map[i] = false;
+			temp.pop_back();
+		}
+	}
+
+	bool check()
+	{
+		for (int i = 1; i <= temp.size(); ++i)
+		{
+			if (i % temp[i - 1] != 0 && temp[i - 1] % i != 0)
+				return false;
+		}
+
+		return true;
+	}
+
+private:
+	unordered_map<int, bool> map;
+	vector<int> temp;
+	int res = 0;
 };
 
 #pragma endregion
@@ -1019,15 +1168,15 @@ void rotate(vector<vector<int>>& matrix)
 
 #pragma endregion
 
-vector<string> CurrentProblem(int n)
+int CurrentProblem(int n)
 {
-	return GenerateParenthesesSolution().generateParenthesis(n);
+	return BeautifulArrangementSolution().countArrangement(n);
 }
 
 void main()
 {
-	vector<int> a = { 1,8,6,2,5,4,8,3,7 };
-	vector<int> a1 = { 3,4 };
+	vector<int> a = { 0,1,0,2,1,0,1,3,2,1,2,1 };
+	vector<int> a1 = { 1,2,3 };
 	vector<vector<int>> b{ {1} };
 	vector<string> c{ "Leet", "Code" };
 	string s1 = "a";
@@ -1041,6 +1190,6 @@ void main()
 	root->right->left = &TreeNode(6);
 	root->right->right = &TreeNode(7);
 
-	//printVectorString(CurrentProblem(3));
-	cout << maxArea(a) << endl;
+	//printDPTable(CurrentProblem(a1));
+	cout << CurrentProblem(3) << endl;
 }

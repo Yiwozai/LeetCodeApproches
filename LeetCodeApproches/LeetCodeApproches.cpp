@@ -796,6 +796,28 @@ ListNode *detectCycle(ListNode *head)
 	return nullptr;
 }
 
+// 206
+ListNode* reverseList(ListNode* head) 
+{
+	if (head == nullptr) return nullptr;
+	if (head->next == nullptr) return head;
+
+	ListNode *cur, *pre, *next;
+	pre = nullptr;
+	cur = head;
+	next = head->next;
+
+	while (next != nullptr)
+	{
+		next = cur->next;
+		cur->next = pre;
+		pre = cur;
+		cur = next;
+	}
+
+	return pre;
+}
+
 #pragma endregion
 
 #pragma region Two Pointers
@@ -1190,6 +1212,18 @@ void main()
 	root->right->left = &TreeNode(6);
 	root->right->right = &TreeNode(7);
 
+	ListNode *node = &ListNode(1);
+	node->next = &ListNode(2);
+	node->next->next = &ListNode(3);
+	node->next->next->next = &ListNode(4);
+	node->next->next->next->next = &ListNode(5);
+
 	//printDPTable(CurrentProblem(a1));
-	cout << CurrentProblem(3) << endl;
+	//cout << CurrentProblem(3) << endl;
+	ListNode *listNode = reverseList(node);
+	while (listNode != nullptr)
+	{
+		cout << listNode->val << endl;
+		listNode = listNode->next;
+	}
 }

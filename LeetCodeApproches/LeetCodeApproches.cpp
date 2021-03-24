@@ -793,6 +793,24 @@ int maxArea(vector<int>& height)
 	return res;
 }
 
+// 42
+int trap(vector<int>& height)
+{
+	if (height.empty()) return;
+
+	auto l = height.begin(), r = height.end() - 1;
+	int level = 0, res = 0;
+
+	while (l != r + 1)
+	{
+		int lower = *l > *r ? *l++ : *r--;
+		level = max(level, lower);
+		res += level - lower;
+	}
+
+	return res;
+}
+
 #pragma endregion
 
 #pragma region Tree

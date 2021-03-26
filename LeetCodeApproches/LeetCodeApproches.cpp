@@ -6,6 +6,7 @@
 #include <numeric>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 using namespace std;
 
@@ -61,7 +62,63 @@ void printDPTable(vector<vector<int>>&& T)
 	cout << '\n';
 }
 
+void printDoubleDPTable(vector<int> T1, vector<int> T2)
+{
+	if (T1.size() != T2.size()) return;
+
+	int n = T1.size();
+
+	for (int i = 0; i < n; ++i)
+	{
+		cout << T1[i] << " * " << T2[i] << endl;
+	}
+}
+
+void printDoubleDPTable(vector<vector<int>> T1, vector<vector<int>> T2)
+{
+	if (T1.empty() || T2.empty()) return;
+	if (T1.size() != T2.size() || T1[0].size() != T2[0].size()) return;
+
+	int n = T1.size(), m = T1[0].size();
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < m; ++j)
+		{
+			cout << T1[i][j] << " * " << T2[i][j] << '\t';
+		}
+
+		cout << '\n';
+	}
+
+	cout << endl;
+}
+
 void printDPTable(vector<vector<bool>>& T)
+{
+	int len = T[0].size();
+
+	cout << "\t";
+	for (int i = 0; i < len; ++i)
+		cout << i << "\t";
+	cout << '\n' << endl;
+
+	int col = 0;
+	for (auto a : T)
+	{
+		cout << col << "\t";
+		++col;
+
+		for (auto b : a)
+		{
+			cout << b << "\t";
+		}
+		cout << '\n' << endl;
+	}
+	cout << '\n';
+}
+
+void printDPTable(vector<vector<int>>& T)
 {
 	int len = T[0].size();
 
@@ -101,7 +158,103 @@ int binarySearch(vector<int>& nums, int target)
 	return -1;
 }
 
+#pragma region Sort
+
+// 快排
+class QuickSortSolution
+{
+public:
+	vector<int>& Sort(vector<int>& nums)
+	{
+		//QuickSort(0, nums.size() - 1, nums);
+		QuickSortTailRecursion(0, nums.size() - 1, nums);
+
+		return nums;
+	}
+
+	void QuickSort(int left, int right, vector<int>& nums)
+	{
+		if (left < right)
+		{
+			int p = Partition(left, right, nums);
+			QuickSort(left, p - 1, nums);
+			QuickSort(p + 1, right, nums);
+		}
+	}
+
+	// Space: O(n) -> O(lgn)
+	void QuickSortTailRecursion(int left, int right, vector<int>& nums)
+	{
+		while (left < right)
+		{
+			int p = Partition(left, right, nums);
+			if (p - left < right - p)
+			{
+				QuickSortTailRecursion(left, p - 1, nums);
+				left = p + 1;
+			}
+			else
+			{
+				QuickSortTailRecursion(p + 1, right, nums);
+				right = p - 1;
+			}
+		}
+	}
+
+	int Partition(int left, int right, vector<int>& nums)
+	{
+		int pivot = nums[right], index = left - 1;
+
+		for (int i = left; i < right; ++i)
+		{
+			if (nums[i] <= pivot)
+			{
+				++index;
+				int temp = nums[i];
+				nums[i] = nums[index];
+				nums[index] = temp;
+			}
+		}
+
+		nums[right] = nums[index + 1];
+		nums[index + 1] = pivot;
+
+		return index + 1;
+	}
+};
+
+// 归并
+class MergeSortSolution
+{
+public:
+	vector<int> Sort(vector<int>& nums)
+	{
+
+	}
+};
+
+// 堆排序
+class HeapSortSolution
+{
+public:
+	vector<int> Sort(vector<int>& nums)
+	{
+
+	}
+
+	// MAX-HEAPIFY(A, i)
+	// BUILD-HEAP(A)
+	// HEAP-SORT(A)
+};
+
+// 中位数
+
+// LRU
+
+#pragma endregion
+
 #pragma region DP
+
 #pragma region Stock Trade
 
 // 121
@@ -218,112 +371,22 @@ int maxProfitWithFee(vector<int>& prices, int fee)
 
 #pragma endregion
 
-// 5
-string longestPalindrome(string s)
+#pragma region Single
+
+#pragma region Rely on O(1) Sub Problem
+
+// 392
+bool isSubsequence(string s, string t)
 {
-	int len = s.size();
-	if (len <= 1) return s;
+	int index = 0;
 
-	vector<vector<bool>> T(len, vector<bool>(len, false));
-	for (int i = 0; i < len; ++i)
-		T[i][i] = true;
-
-	int start = 0, maxDis = 0;
-	for (int i = len; i >= 0; --i)
+	for (auto c : t)
 	{
-		for (int dis = 1; dis < len - i; ++dis)
-		{
-			if (dis == 1 && s[i] == s[i + dis])
-			{
-				T[i][i + dis] = true;
-			}
-			else if (s[i] == s[i + dis])
-			{
-				T[i][i + dis] = T[i + 1][i + dis - 1];
-			}
-
-			if (T[i][i + dis] && dis > maxDis)
-			{
-				start = i;
-				maxDis = dis;
-			}
-
-			cout << i << "   " << i + dis << endl;
-			printDPTable(T);
-		}
+		if (c == s[index])
+			++index;
 	}
 
-	cout << "The last: " << endl;
-	printDPTable(T);
-
-	return s.substr(start, maxDis + 1);
-}
-
-string longestPalindrome2(string s)
-{
-	int len = s.size();
-	if (len <= 1) return s;
-
-	vector<vector<bool>> T(len, vector<bool>(len, false));
-	for (int i = 0; i < len; ++i)
-		T[i][i] = true;
-
-	int start = 0, maxLen = 0;
-	for (int l = 1; l < len; ++l)
-	{
-		for (int i = 0; i < len - l; ++i)
-		{
-			if (l == 1)
-				T[i][i + l] = s[i] == s[i + l];
-			else
-				T[i][i + l] = (s[i] == s[i + l] && T[i + 1][i + l - 1]);
-
-			if (T[i][i + l])
-			{
-				start = i;
-				maxLen = l;
-				cout << s.substr(start, maxLen + 1) << endl;
-			}
-
-			cout << i << "   " << i + l << endl;
-			printDPTable(T);
-		}
-	}
-
-	printDPTable(T);
-	return s.substr(start, maxLen + 1);
-}
-
-// 322
-int coinChange(vector<int>& coins, int amount)
-{
-	vector<int> T(amount + 1, amount + 1);
-	T[0] = 0;
-	for (auto c : coins)
-	{
-		for (int i = c; i <= amount; ++i)
-		{
-			T[i] = min(T[i], T[i - c] + 1);
-		}
-	}
-
-	return T[amount] > amount ? -1 : T[amount];
-}
-
-// 53
-int maxSubArray(vector<int>& nums)
-{
-	int length = nums.size();
-	vector<int> T(length, 0);
-	int m = T[0] = nums[0];
-
-	for (int i = 1; i < length; ++i)
-	{
-		T[i] = T[i - 1] > 0 ? T[i - 1] + nums[i] : nums[i];
-		m = max(m, T[i]);
-	}
-
-	return m;
+	return index == s.size() ? true : false;
 }
 
 // 70
@@ -345,37 +408,20 @@ int climbStairs(int n)
 	return target;
 }
 
-// 198
-int rob(vector<int>& nums)
+// 53
+int maxSubArray(vector<int>& nums)
 {
-	int len = nums.size();
-	if (len == 0) return 0;
-	if (len == 1) return nums[0];
+	int length = nums.size();
+	vector<int> T(length, 0);
+	int m = T[0] = nums[0];
 
-	vector<int> T(len, 0);
-	T[0] = nums[0];
-	T[1] = nums[1] > nums[0] ? nums[1] : nums[0];
-
-	for (int i = 2; i < len; ++i)
+	for (int i = 1; i < length; ++i)
 	{
-		T[i] = max(T[i - 1], T[i - 2] + nums[i]);
+		T[i] = T[i - 1] > 0 ? T[i - 1] + nums[i] : nums[i];
+		m = max(m, T[i]);
 	}
 
-	return T[len - 1];
-}
-
-// 392
-bool isSubsequence(string s, string t)
-{
-	int index = 0;
-
-	for (auto c : t)
-	{
-		if (c == s[index])
-			++index;
-	}
-
-	return index == s.size() ? true : false;
+	return m;
 }
 
 // 62
@@ -465,30 +511,6 @@ int minimumTotal(vector<vector<int>>& triangle)
 	return min;
 }
 
-// 221
-int maximalSquare(vector<vector<int>>& matrix)
-{
-	if (matrix.empty()) return 0;
-	int m = matrix.size(), n = matrix[0].size();
-	vector<vector<int>> T(m, vector<int>(n, 0));
-
-	int size = 0;
-	for (int i = 0; i < m; ++i)
-	{
-		for (int j = 0; j < n; ++j)
-		{
-			if (i == 0 || j == 0 || matrix[i][j] == 0)
-				T[i][j] = matrix[i][j] - 0;
-			else
-				T[i][j] = min(T[i - 1][j - 1], min(T[i - 1][j], T[i][j - 1])) + 1;
-
-			size = max(size, T[i][j]);
-		}
-	}
-
-	return size * size;
-}
-
 // 264
 int nthUglyNumber(int n)
 {
@@ -514,6 +536,283 @@ int nthUglyNumber(int n)
 	return T[n - 1];
 }
 
+// 198  *
+int rob(vector<int>& nums)
+{
+	int len = nums.size();
+	if (len == 0) return 0;
+	if (len == 1) return nums[0];
+
+	vector<int> T(len, 0);
+	T[0] = nums[0];
+	T[1] = nums[1] > nums[0] ? nums[1] : nums[0];
+
+	for (int i = 2; i < len; ++i)
+	{
+		T[i] = max(T[i - 1], T[i - 2] + nums[i]);
+	}
+
+	return T[len - 1];
+}
+
+// 740 **
+int deleteAndEarn(vector<int>& nums)
+{
+	vector<int> T(10001, 0);
+	for (auto n : nums)
+	{
+		T[n] += n;
+	}
+
+	return rob(T);
+}
+
+// 221 **
+int maximalSquare(vector<vector<int>>& matrix)
+{
+	if (matrix.empty()) return 0;
+	int m = matrix.size(), n = matrix[0].size();
+	vector<vector<int>> T(m, vector<int>(n, 0));
+
+	int size = 0;
+	for (int i = 0; i < m; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			if (i == 0 || j == 0 || matrix[i][j] == 0)
+				T[i][j] = matrix[i][j] - 0;
+			else
+				T[i][j] = min(T[i - 1][j - 1], min(T[i - 1][j], T[i][j - 1])) + 1;
+
+			size = max(size, T[i][j]);
+		}
+	}
+
+	return size * size;
+}
+
+// 5 ***
+string longestPalindrome(string s)
+{
+	int len = s.size();
+	if (len <= 1) return s;
+
+	vector<vector<bool>> T(len, vector<bool>(len, false));
+	for (int i = 0; i < len; ++i)
+		T[i][i] = true;
+
+	int start = 0, maxDis = 0;
+	for (int i = len; i >= 0; --i)
+	{
+		for (int dis = 1; dis < len - i; ++dis)
+		{
+			if (dis == 1 && s[i] == s[i + dis])
+			{
+				T[i][i + dis] = true;
+			}
+			else if (s[i] == s[i + dis])
+			{
+				T[i][i + dis] = T[i + 1][i + dis - 1];
+			}
+
+			if (T[i][i + dis] && dis > maxDis)
+			{
+				start = i;
+				maxDis = dis;
+			}
+
+			cout << i << "   " << i + dis << endl;
+			printDPTable(T);
+		}
+	}
+
+	cout << "The last: " << endl;
+	printDPTable(T);
+
+	return s.substr(start, maxDis + 1);
+}
+
+string longestPalindrome2(string s)
+{
+	int len = s.size();
+	if (len <= 1) return s;
+
+	vector<vector<bool>> T(len, vector<bool>(len, false));
+	for (int i = 0; i < len; ++i)
+		T[i][i] = true;
+
+	int start = 0, maxLen = 0;
+	for (int l = 1; l < len; ++l)
+	{
+		for (int i = 0; i < len - l; ++i)
+		{
+			if (l == 1)
+				T[i][i + l] = s[i] == s[i + l];
+			else
+				T[i][i + l] = (s[i] == s[i + l] && T[i + 1][i + l - 1]);
+
+			if (T[i][i + l])
+			{
+				start = i;
+				maxLen = l;
+				cout << s.substr(start, maxLen + 1) << endl;
+			}
+
+			cout << i << "   " << i + l << endl;
+			printDPTable(T);
+		}
+	}
+
+	printDPTable(T);
+	return s.substr(start, maxLen + 1);
+}
+
+#pragma endregion
+
+#pragma region Rely on O(n) Sub Problems
+
+// 279 *
+int numSquares(int n)
+{
+	if (n <= 1) return n;
+
+	vector<int> T(n + 1, INT_MAX >> 1);
+	T[0] = 0;
+
+	for (int i = 2; i <= n; ++i)
+		for (int j = 1; j * j <= i; ++j)
+			T[i] = min(T[i], T[i - j * j] + 1);
+
+	return T[n];
+}
+
+// 312 *
+int maxCoins(vector<int>& nums)
+{
+	int n = nums.size();
+	nums.insert(nums.begin(), 1);
+	nums.push_back(1);
+
+	vector<vector<int>> T(n + 2, vector<int>(n + 2, 0));
+
+	for (int len = 1; len <= n; ++len)
+	{
+		for (int left = 1; left <= n - len + 1; ++left)
+		{
+			int right = left + len - 1;
+			for (int k = left; k <= right; ++k)
+			{
+				T[left][right] = max(T[left][right], T[left][k - 1] + (nums[left - 1] * nums[k] * nums[right + 1]) + T[k + 1][right]);
+			}
+		}
+	}
+
+	return T[1][n];
+}
+
+// 300 ***
+int lengthOfLIS(vector<int>& nums)
+{
+	if (nums.empty()) return 0;
+	vector<int> T(nums.size(), 1);
+
+	for (int i = 1; i < nums.size(); ++i)
+	{
+		for (int j = 0; j < i; ++j)
+		{
+			if (nums[j] < nums[i])
+				T[i] = max(T[j] + 1, T[i]);
+		}
+	}
+
+	return *max_element(T.begin(), T.end());
+}
+
+// 85 ***
+int maximalRectangle(vector<vector<char> > &matrix) {
+	if (matrix.empty()) return 0;
+	int n = matrix.size(), m = matrix[0].size(), res = 0;
+	vector<vector<int>> T(n, vector<int>(m, 0));
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < m; ++j)
+		{
+			if (matrix[i][j] == '1')
+				T[i][j] = j == 0 ? 1 : (T[i][j - 1] + 1);
+		}
+	}
+
+	printDPTable(T);
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < m; ++j)
+		{
+			int len = INT_MAX;
+
+			for (int k = i; k < n; ++k)
+			{
+				len = min(len, T[k][j]);
+				res = max(res, len * (k - i + 1));
+			}
+		}
+	}
+
+	return res;
+}
+
+#pragma endregion
+
+// TODO
+// 898
+int subarrayBitwiseORs(vector<int>& arr) 
+{
+	return 0;
+}
+
+#pragma endregion
+
+#pragma region Double
+
+// 322
+int coinChange(vector<int>& coins, int amount)
+{
+	vector<int> T(amount + 1, amount + 1);
+	T[0] = 0;
+	for (auto c : coins)
+	{
+		for (int i = c; i <= amount; ++i)
+		{
+			T[i] = min(T[i], T[i - c] + 1);
+		}
+	}
+
+	return T[amount] > amount ? -1 : T[amount];
+}
+
+// 72
+int MinDistance(string word1, string word2)
+{
+	int m = word1.size(), n = word2.size();
+	vector<vector<int>> T(m + 1, vector<int>(n + 1, 0));
+	for (int i = 1; i <= m; ++i) T[i][0] = i;
+	for (int i = 1; i <= n; ++i) T[0][i] = i;
+
+	for (int i = 1; i <= m; ++i)
+	{
+		for (int j = 1; j <= n; ++j)
+		{
+			if (word1[i - 1] == word2[j - 1])
+				T[i][j] = T[i - 1][j - 1];
+			else
+				T[i][j] = min(min(T[i - 1][j - 1], T[i - 1][j]), T[i][j - 1]) + 1;
+		}
+	}
+
+	return T[m][n];
+}
+
 // 139
 bool wordBreak(string s, vector<string>& wordDict)
 {
@@ -526,14 +825,10 @@ bool wordBreak(string s, vector<string>& wordDict)
 	{
 		for (int j = i - 1; j >= 0; --j)
 		{
-			if (T[j])
+			if (T[j] && find(wordDict.cbegin(), wordDict.cend(), s.substr(j, i - j)) != wordDict.end())
 			{
-				string word = s.substr(j, i - j);
-				if (find(wordDict.begin(), wordDict.end(), word) != wordDict.end())
-				{
-					T[i] = true;
-					break;
-				}
+				T[i] = true;
+				break;
 			}
 		}
 	}
@@ -578,132 +873,7 @@ int findLength(vector<int>& A, vector<int>& B)
 	return res;
 }
 
-// 300
-int lengthOfLIS(vector<int>& nums)
-{
-	if (nums.empty()) return 0;
-	vector<int> T(nums.size(), 1);
-
-	for (int i = 1; i < nums.size(); ++i)
-	{
-		for (int j = 0; j < i; ++j)
-		{
-			if (nums[j] < nums[i])
-				T[i] = max(T[j] + 1, T[i]);
-		}
-	}
-
-	return *max_element(T.begin(), T.end());
-}
-
-// 312
-int maxCoins(vector<int>& nums)
-{
-	int n = nums.size();
-	nums.insert(nums.begin(), 1);
-	nums.push_back(1);
-
-	vector<vector<int>> T(n + 2, vector<int>(n + 2, 0));
-
-	for (int len = 1; len <= n; ++len)
-	{
-		for (int left = 1; left <= n - len + 1; ++left)
-		{
-			int right = left + len - 1;
-			for (int k = left; k <= right; ++k)
-			{
-				T[left][right] = max(T[left][right], T[left][k - 1] + (nums[left - 1] * nums[k] * nums[right + 1]) + T[k + 1][right]);
-			}
-		}
-	}
-
-	return T[1][n];
-}
-
-// 898
-int subarrayBitwiseORs(vector<int>& arr) 
-{
-	return 0;
-}
-
-// 698
-class Solution {
-public:
-	// use global variables to avoid long parameter list
-	int target; // of each bucket
-	vector< int > ns;
-	vector< int > bucket;
-
-	//bool canPartitionKSubsets(vector<int>& nums, int k) {
-	//	int sum = 0;
-	//	for (int &n : nums) sum += n;
-	//	if (sum % k) return false; // not divisible
-	//	target = sum / k;
-	//	ns = vector< int >(nums);
-	//	bucket = vector< int >(k, 0);
-	//	// starting with bigger ones makes it faster
-	//	sort(ns.begin(), ns.end(), greater<int>());
-	//	//reverse(ns.begin(), ns.end());
-	//	return put(0);
-	//}
-
-	//// put #n item of ns into some bucket to meet target
-	//bool put(int n) {
-	//	for (int i = 0; i < bucket.size(); ++i) {
-	//		if (bucket[i] + ns[n] > target) continue; // try next bucket
-	//		bucket[i] += ns[n]; // put it in!
-	//		if (n == ns.size() - 1) return true; // all items in bucket, no overflow
-	//		if (put(n + 1)) return true; // move on to next item
-	//		else { // no solution = wrong bucket
-	//			bucket[i] -= ns[n]; // take it out
-	//			if (bucket[i] == 0) return false; // no need to try other empty bucket
-	//		}
-	//	}
-	//	return false; // no bucket fits
-	//}
-
-	bool canPartitionKSubsets(vector<int>& nums, int k) {
-		const int sum = accumulate(nums.begin(), nums.end(), 0);
-		if (sum%k != 0) return false;
-		sort(nums.rbegin(), nums.rend());
-		return dfs(nums, sum / k, 0, k, 0);
-	}
-
-	bool dfs(const vector<int>&nums, int target, int cur, int k, int used) {
-		if (k == 0) return used == (1 << nums.size()) - 1;
-		for (int i = 0; i < nums.size(); i++) {
-			if (used&(1 << i)) continue;
-			int t = cur + nums[i];
-			if (t > target) break;
-			int new_used = used | (1 << i);
-			if (t == target && dfs(nums, target, 0, k - 1, new_used)) return true;
-			else if (dfs(nums, target, t, k, new_used)) return true;
-		}
-		return false;
-	}
-};
-
-// 72
-int MinDistance(string word1, string word2)
-{
-	int m = word1.size(), n = word2.size();
-	vector<vector<int>> T(m + 1, vector<int>(n + 1, 0));
-	for (int i = 1; i <= m; ++i) T[i][0] = i;
-	for (int i = 1; i <= n; ++i) T[0][i] = i;
-
-	for (int i = 1; i <= m; ++i)
-	{
-		for (int j = 1; j <= n; ++j)
-		{
-			if (word1[i - 1] == word2[j - 1])
-				T[i][j] = T[i - 1][j - 1];
-			else
-				T[i][j] = min(min(T[i - 1][j - 1], T[i - 1][j]), T[i][j - 1]) + 1;
-		}
-	}
-
-	return T[m][n];
-}
+#pragma endregion
 
 #pragma endregion
 
@@ -772,50 +942,53 @@ bool hasCycle(ListNode *head)
 	return false;
 }
 
-// TODO
 // 142
 ListNode *detectCycle(ListNode *head) 
 {
+	if (head == nullptr) return nullptr;
+
 	ListNode *walker, *runner;
 	walker = runner = head;
-	bool isCycle = false;
+	bool hasCycle = false;
 
-	while (walker != nullptr && runner != nullptr)
+	while (runner->next != nullptr && runner->next->next != nullptr)
+	{
+		walker = walker->next;
+		runner = runner->next->next;
+		if (walker == runner)
+		{
+			hasCycle = true;
+			break;
+		}
+	}
+
+	if (hasCycle == false) return nullptr;
+
+	walker = head;
+	while (walker != runner)
 	{
 		walker = walker->next;
 		runner = runner->next;
-		if (runner == nullptr) return nullptr;
-		runner = runner->next;
-
-		if (walker == runner)
-			isCycle = true;
 	}
 
-	if (isCycle == false) return nullptr;
-	
-	return nullptr;
+	return walker;
 }
 
 // 206
 ListNode* reverseList(ListNode* head) 
 {
-	if (head == nullptr) return nullptr;
-	if (head->next == nullptr) return head;
+	ListNode* prev = nullptr;
+	ListNode* curr = head;
+	ListNode* next;
 
-	ListNode *cur, *pre, *next;
-	pre = nullptr;
-	cur = head;
-	next = head->next;
-
-	while (next != nullptr)
-	{
-		next = cur->next;
-		cur->next = pre;
-		pre = cur;
-		cur = next;
+	while (curr) {
+		next = curr->next;
+		curr->next = prev;
+		prev = curr;
+		curr = next;
 	}
 
-	return pre;
+	return prev;
 }
 
 #pragma endregion
@@ -1155,6 +1328,63 @@ private:
 	int res = 0;
 };
 
+// 698
+class PartitionKSubsetsSolution {
+public:
+	// use global variables to avoid long parameter list
+	int target; // of each bucket
+	vector< int > ns;
+	vector< int > bucket;
+
+	//bool canPartitionKSubsets(vector<int>& nums, int k) {
+	//	int sum = 0;
+	//	for (int &n : nums) sum += n;
+	//	if (sum % k) return false; // not divisible
+	//	target = sum / k;
+	//	ns = vector< int >(nums);
+	//	bucket = vector< int >(k, 0);
+	//	// starting with bigger ones makes it faster
+	//	sort(ns.begin(), ns.end(), greater<int>());
+	//	//reverse(ns.begin(), ns.end());
+	//	return put(0);
+	//}
+
+	//// put #n item of ns into some bucket to meet target
+	//bool put(int n) {
+	//	for (int i = 0; i < bucket.size(); ++i) {
+	//		if (bucket[i] + ns[n] > target) continue; // try next bucket
+	//		bucket[i] += ns[n]; // put it in!
+	//		if (n == ns.size() - 1) return true; // all items in bucket, no overflow
+	//		if (put(n + 1)) return true; // move on to next item
+	//		else { // no solution = wrong bucket
+	//			bucket[i] -= ns[n]; // take it out
+	//			if (bucket[i] == 0) return false; // no need to try other empty bucket
+	//		}
+	//	}
+	//	return false; // no bucket fits
+	//}
+
+	bool canPartitionKSubsets(vector<int>& nums, int k) {
+		const int sum = accumulate(nums.begin(), nums.end(), 0);
+		if (sum%k != 0) return false;
+		sort(nums.rbegin(), nums.rend());
+		return dfs(nums, sum / k, 0, k, 0);
+	}
+
+	bool dfs(const vector<int>&nums, int target, int cur, int k, int used) {
+		if (k == 0) return used == (1 << nums.size()) - 1;
+		for (int i = 0; i < nums.size(); i++) {
+			if (used&(1 << i)) continue;
+			int t = cur + nums[i];
+			if (t > target) break;
+			int new_used = used | (1 << i);
+			if (t == target && dfs(nums, target, 0, k - 1, new_used)) return true;
+			else if (dfs(nums, target, t, k, new_used)) return true;
+		}
+		return false;
+	}
+};
+
 #pragma endregion
 
 #pragma region Math
@@ -1190,15 +1420,44 @@ void rotate(vector<vector<int>>& matrix)
 
 #pragma endregion
 
-int CurrentProblem(int n)
+int CurrentProblem(vector<int>& nums)
 {
-	return BeautifulArrangementSolution().countArrangement(n);
+	int n = nums.size();
+	if (n == 0) return 0;
+	vector<int> T(n + 1, 1);
+
+	for (int i = 1; i <= n; ++i)
+	{
+		for (int j = 1; j < i; ++j)
+		{
+			if (nums[j - 1] < nums[i - 1])
+			{
+				T[i] = max(T[i], T[j] + 1);
+			}
+		}
+	}
+
+	return *max_element(T.begin(), T.end());
 }
 
 void main()
 {
 	vector<int> a = { 0,1,0,2,1,0,1,3,2,1,2,1 };
-	vector<int> a1 = { 1,2,3 };
+	vector<int> a1 = { 7, 5, 6, 8, 1, 4, 2, 9, 3 };
+	//vector<vector<char>> T
+	//{
+	//	{ '0','0','0','0','0','0','1' },
+	//	{ '0','0','0','0','1','1','1'},
+	//	{ '1','1','1','1','1','1','1' },
+	//	{ '0','0','0','1','1','1','1' }
+	//};
+	vector<vector<char>> T
+	{
+		{ '1','0','1','0','0' },
+		{ '1','0','1','1','1'},
+		{ '1','1','1','1','1' },
+		{ '1','0','0','1','0' }
+	};
 	vector<vector<int>> b{ {1} };
 	vector<string> c{ "Leet", "Code" };
 	string s1 = "a";
@@ -1217,13 +1476,8 @@ void main()
 	node->next->next = &ListNode(3);
 	node->next->next->next = &ListNode(4);
 	node->next->next->next->next = &ListNode(5);
+	node->next->next->next->next->next = node->next->next;
 
-	//printDPTable(CurrentProblem(a1));
-	//cout << CurrentProblem(3) << endl;
-	ListNode *listNode = reverseList(node);
-	while (listNode != nullptr)
-	{
-		cout << listNode->val << endl;
-		listNode = listNode->next;
-	}
+	
+	cout << CurrentProblem(a1) << endl;
 }

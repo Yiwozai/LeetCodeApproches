@@ -686,7 +686,8 @@ int numSquares(int n)
 	return T[n];
 }
 
-// 312 *
+// 312 ***
+// 戳气球
 int maxCoins(vector<int>& nums)
 {
 	int n = nums.size();
@@ -869,6 +870,8 @@ int findLength(vector<int>& A, vector<int>& B)
 			res = max(res, T[i][j] = A[i - 1] == B[j - 1] ? T[i - 1][j - 1] + 1 : 0);
 		}
 	}
+
+	printDPTable(T);
 
 	return res;
 }
@@ -1443,7 +1446,8 @@ int CurrentProblem(vector<int>& nums)
 void main()
 {
 	vector<int> a = { 0,1,0,2,1,0,1,3,2,1,2,1 };
-	vector<int> a1 = { 7, 5, 6, 8, 1, 4, 2, 9, 3 };
+	vector<int> a1 = { 1,2,3,2,1 };
+	vector<int> a2 = { 3,2,1,4,7 };
 	//vector<vector<char>> T
 	//{
 	//	{ '0','0','0','0','0','0','1' },
@@ -1479,5 +1483,5 @@ void main()
 	node->next->next->next->next->next = node->next->next;
 
 	
-	cout << CurrentProblem(a1) << endl;
+	cout << findLength(a1, a2) << endl;
 }

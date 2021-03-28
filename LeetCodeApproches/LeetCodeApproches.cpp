@@ -375,6 +375,38 @@ int maxProfitWithFee(vector<int>& prices, int fee)
 
 #pragma region Rely on O(1) Sub Problem
 
+// 746
+int minCostClimbingStairs(vector<int>& cost)
+{
+	int n = cost.size();
+	vector<int> T(n + 1, 0);
+	T[1] = cost[0];
+
+	for (int i = 2; i <= n; ++i)
+	{
+		T[i] = min(T[i - 1], T[i - 2]) + cost[i - 1];
+	}
+
+	return min(T[n], T[n - 1]);
+}
+
+// 1137 
+int tribonacci(int n)
+{
+	if (n == 0) return 0;
+	else if (n == 1 || n == 2) return 1;
+
+	vector<int> T(n + 1, 0);
+	T[1] = T[2] = 1;
+
+	for (int i = 3; i <= n; ++i)
+	{
+		T[i] = T[i - 2] + T[i - 1] + T[i - 3];
+	}
+
+	return T[n];
+}
+
 // 392
 bool isSubsequence(string s, string t)
 {
@@ -534,6 +566,80 @@ int nthUglyNumber(int n)
 	}
 
 	return T[n - 1];
+}
+
+// 174 
+int calculateMinimumHP(vector<vector<int>>& dungeon)
+{
+#pragma region Wrong Answer
+	// XXX: Current answer is wrong. Min is lower, but Cur is higher.
+// 	vector<vector<int>> b
+//{
+//	{1, -3, 3},
+//	{ 0, -2, 0 },
+//	{ -3, -3, -3 },
+//};
+	//int n = dungeon.size(), m = dungeon[0].size();
+	//vector<vector<int>> T1(n + 1, vector<int>(m + 1, 0));	// minimun HP needed
+	//vector<vector<int>> T2(n + 1, vector<int>(m + 1, 0));	// current HP
+
+	//T1[1][1] = T2[1][1] = dungeon[0][0];
+	//for (int i = 1; i <= n; ++i)
+	//	T1[i][0] = T2[i][0] = INT_MIN >> 1;
+	//for (int i = 1; i <= m; ++i)
+	//	T1[0][i] = T2[0][i] = INT_MIN >> 1;
+
+	//for (int i = 1; i <= n; ++i)
+	//{
+	//	for (int j = 1; j <= m; ++j)
+	//	{
+	//		if (i == 1 && j == 1) continue;
+
+	//		int up_cur = T2[i - 1][j] + dungeon[i - 1][j - 1];
+	//		int up_min = min(up_cur, T1[i - 1][j]);
+
+	//		int left_cur = T2[i][j - 1] + dungeon[i - 1][j - 1];
+	//		int left_min = min(left_cur, T1[i][j - 1]);
+
+	//		if (left_min > up_min)
+	//		{
+	//			T1[i][j] = left_min;
+	//			T2[i][j] = left_cur;
+	//		}
+	//		else if (left_min < up_min)
+	//		{
+	//			T1[i][j] = up_min;
+	//			T2[i][j] = up_cur;
+	//		}
+	//		else
+	//		{
+	//			T1[i][j] = up_min;
+	//			T2[i][j] = max(up_cur, left_cur);
+	//		}
+	//	}
+	//}
+
+	//return T1[n][m] > 0 ? 1 : -T1[n][m] + 1;
+
+#pragma endregion
+
+	int n = dungeon.size(), m = dungeon[0].size();
+	vector<vector<int>> T(n + 1, vector<int>(m + 1, INT_MAX));
+
+	T[n][m - 1] = T[n - 1][m] = 1;
+
+	for (int i = n - 1; i >= 0; i--) 
+	{
+		for (int j = m - 1; j >= 0; j--) 
+		{
+			int need = min(T[i + 1][j], T[i][j + 1]) - dungeon[i][j];
+			T[i][j] = need <= 0 ? 1 : need;
+
+			printDPTable(T);
+		}
+	}
+
+	return T[0][0];
 }
 
 // 198  *
@@ -696,15 +802,29 @@ int maxCoins(vector<int>& nums)
 
 	vector<vector<int>> T(n + 2, vector<int>(n + 2, 0));
 
-	for (int len = 1; len <= n; ++len)
+	//for (int len = 1; len <= n; ++len)
+	//{
+	//	for (int left = 1; left <= n - len + 1; ++left)
+	//	{
+	//		int right = left + len - 1;
+	//		for (int k = left; k <= right; ++k)
+	//		{
+	//			T[left][right] = max(T[left][right], T[left][k - 1] + (nums[left - 1] * nums[k] * nums[right + 1]) + T[k + 1][right]);
+	//		}
+	//	}
+	//}
+
+	for (int r = 1; r <= n; ++r)
 	{
-		for (int left = 1; left <= n - len + 1; ++left)
+		for (int l = r; l > 0; --l)
 		{
-			int right = left + len - 1;
-			for (int k = left; k <= right; ++k)
+			for (int i = l; i <= r; ++i)
 			{
-				T[left][right] = max(T[left][right], T[left][k - 1] + (nums[left - 1] * nums[k] * nums[right + 1]) + T[k + 1][right]);
+				//cout << "left: " << l << "    right: " << r << "    i: " << i << "    res: " << T[l][i - 1] + nums[l - 1] * nums[i] * nums[r + 1] + T[i + 1][r] << endl;
+				T[l][r] = max(T[l][r], T[l][i - 1] + nums[l - 1] * nums[i] * nums[r + 1] + T[i + 1][r]);
 			}
+
+			//cout << "left: " << l << "    right: " << r << "    max: " << T[l][r] << '\n' << endl;
 		}
 	}
 
@@ -1426,28 +1546,31 @@ void rotate(vector<vector<int>>& matrix)
 int CurrentProblem(vector<int>& nums)
 {
 	int n = nums.size();
-	if (n == 0) return 0;
-	vector<int> T(n + 1, 1);
+	nums.insert(nums.begin(), 1), nums.push_back(1);
+	vector<vector<int>> T(n + 2, vector<int>(n + 2, 0));
 
-	for (int i = 1; i <= n; ++i)
+	for (int r = 1; r <= n; ++r)
 	{
-		for (int j = 1; j < i; ++j)
+		for (int l = r; l > 0; --l)
 		{
-			if (nums[j - 1] < nums[i - 1])
+			for (int i = l; i <= r; ++i)
 			{
-				T[i] = max(T[i], T[j] + 1);
+				//cout << "left: " << l << "    right: " << r << "    i: " << i << "    res: " << T[l][i - 1] + nums[l - 1] * nums[i] * nums[r + 1] + T[i + 1][r] << endl;
+				T[l][r] = max(T[l][r], T[l][i - 1] + nums[l - 1] * nums[i] * nums[r + 1] + T[i + 1][r]);
 			}
+
+			//cout << "left: " << l << "    right: " << r << "    max: " << T[l][r] << '\n' << endl;
 		}
 	}
 
-	return *max_element(T.begin(), T.end());
+	return T[1][n];
 }
 
 void main()
 {
 	vector<int> a = { 0,1,0,2,1,0,1,3,2,1,2,1 };
 	vector<int> a1 = { 1,2,3,2,1 };
-	vector<int> a2 = { 3,2,1,4,7 };
+	vector<int> a2 = { 1, 100, 1, 1, 1, 100, 1, 1, 100, 1 };
 	//vector<vector<char>> T
 	//{
 	//	{ '0','0','0','0','0','0','1' },
@@ -1462,7 +1585,12 @@ void main()
 		{ '1','1','1','1','1' },
 		{ '1','0','0','1','0' }
 	};
-	vector<vector<int>> b{ {1} };
+	vector<vector<int>> b
+	{ 
+		{1, -3, 3},
+		{0, -2, 0},
+		{-3, -3, -3},
+	};
 	vector<string> c{ "Leet", "Code" };
 	string s1 = "a";
 	string s2 = "b";
@@ -1482,6 +1610,5 @@ void main()
 	node->next->next->next->next = &ListNode(5);
 	node->next->next->next->next->next = node->next->next;
 
-	
-	cout << findLength(a1, a2) << endl;
+	cout << calculateMinimumHP(b) << endl;
 }

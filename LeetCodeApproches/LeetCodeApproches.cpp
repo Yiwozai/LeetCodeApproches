@@ -805,9 +805,67 @@ string longestPalindrome2(string s)
 	return s.substr(start, maxLen + 1);
 }
 
+// 139
+bool wordBreak(string s, vector<string>& wordDict)
+{
+	if (wordDict.empty()) return false;
+
+	vector<bool> T(s.size() + 1, false);
+	T[0] = true;
+
+	for (int i = 1; i <= s.size(); ++i)
+	{
+		for (int j = i - 1; j >= 0; --j)
+		{
+			if (T[j] && find(wordDict.cbegin(), wordDict.cend(), s.substr(j, i - j)) != wordDict.end())
+			{
+				T[i] = true;
+				break;
+			}
+		}
+	}
+
+	return T[s.size()];
+}
+
 #pragma endregion
 
 #pragma region Rely on O(n) Sub Problems
+
+// 322
+int coinChange(vector<int>& coins, int amount)
+{
+	vector<int> T(amount + 1, amount + 1);
+	T[0] = 0;
+	for (auto c : coins)
+	{
+		for (int i = c; i <= amount; ++i)
+		{
+			T[i] = min(T[i], T[i - c] + 1);
+		}
+	}
+
+	return T[amount] > amount ? -1 : T[amount];
+}
+
+// 377 **
+int combinationSum4(vector<int>& nums, int target)
+{
+	int n = nums.size();
+	vector<int> T(target + 1, 0);
+	T[0] = 1;
+
+	for (int i = 1; i <= target; ++i)
+	{
+		for (auto n : nums)
+		{
+			if (n <= i)
+				T[i] += T[i - n];
+		}
+	}
+
+	return T.back();
+}
 
 // 279 *
 int numSquares(int n)
@@ -822,6 +880,35 @@ int numSquares(int n)
 			T[i] = min(T[i], T[i - j * j] + 1);
 
 	return T[n];
+}
+
+// 416 **
+bool canPartition(vector<int>& nums)
+{
+	int sum = 0;
+	for (auto n : nums)
+		sum += n;
+	if ((sum & 1) == 1) return false;
+	sum /= 2;
+	int n = nums.size();
+	vector<vector<bool>> T(n + 1, vector<bool>(sum + 1, false));
+	for (int i = 0; i <= n; ++i)
+		T[i][0] = true;
+
+	for (int i = 1; i <= n; ++i)
+	{
+		for (int j = 1; j <= sum; ++j)
+		{
+			// T[i][j] = T[i - 1][j] || T[i - 1][j - nums[i]]
+			T[i][j] = T[i - 1][j];
+			if (j >= nums[i - 1])
+				T[i][j] = T[i][j] || T[i - 1][j - nums[i - 1]];
+		}
+	}
+
+	printDPTable(T);
+
+	return T[n][sum];
 }
 
 // 312 ***
@@ -912,73 +999,28 @@ int subarrayBitwiseORs(vector<int>& arr)
 	return 0;
 }
 
-#pragma endregion
-
-#pragma region Double
-
-// 322
-int coinChange(vector<int>& coins, int amount)
-{
-	vector<int> T(amount + 1, amount + 1);
-	T[0] = 0;
-	for (auto c : coins)
-	{
-		for (int i = c; i <= amount; ++i)
-		{
-			T[i] = min(T[i], T[i - c] + 1);
-		}
-	}
-
-	return T[amount] > amount ? -1 : T[amount];
-}
-
-// 377 **
-int combinationSum4(vector<int>& nums, int target)
+// 494
+int findTargetSumWays(vector<int>& nums, int S)
 {
 	int n = nums.size();
-	vector<int> T(target + 1, 0);
-	T[0] = 1;
-
-	for (int i = 1; i <= target; ++i)
-	{
-		for (auto n : nums)
-		{
-			if (n <= i)
-				T[i] += T[i - n];
-		}
-	}
-
-	return T.back();
-}
-
-// 416 **
-bool canPartition(vector<int>& nums)
-{
-	int sum = 0;
-	for (auto n : nums)
-		sum += n;
-	if ((sum & 1) == 1) return false;
-	sum /= 2;
-	int n = nums.size();
-	vector<vector<bool>> T(n + 1, vector<bool>(sum + 1, false));
-	for (int i = 0; i <= n; ++i)
-		T[i][0] = true;
+	vector<vector<int>> T(n + 1, vector<int>(2001, 0));
+	T[0][0] = 1;  // XXX
 
 	for (int i = 1; i <= n; ++i)
 	{
-		for (int j = 1; j <= sum; ++j)
+		for (int j = 0; j <= 2001; ++j)
 		{
-			// T[i][j] = T[i - 1][j] || T[i - 1][j - nums[i]]
-			T[i][j] = T[i - 1][j];
-			if (j >= nums[i - 1])
-				T[i][j] = T[i][j] || T[i - 1][j - nums[i - 1]];
+			T[i][j] += (j - nums[i - 1] > 0 ? T[i - 1][j - nums[i - 1]] : 0)
+				+ (j + nums[i - 1] < 2000 ? T[i - 1][j + nums[i - 1]] : 0);
 		}
 	}
 
-	printDPTable(T);
-
-	return T[n][sum];
+	return T[n][S + 1001];
 }
+
+#pragma endregion
+
+#pragma region Double
 
 // 72
 int MinDistance(string word1, string word2)
@@ -1000,29 +1042,6 @@ int MinDistance(string word1, string word2)
 	}
 
 	return T[m][n];
-}
-
-// 139
-bool wordBreak(string s, vector<string>& wordDict)
-{
-	if (wordDict.empty()) return false;
-
-	vector<bool> T(s.size() + 1, false);
-	T[0] = true;
-
-	for (int i = 1; i <= s.size(); ++i)
-	{
-		for (int j = i - 1; j >= 0; --j)
-		{
-			if (T[j] && find(wordDict.cbegin(), wordDict.cend(), s.substr(j, i - j)) != wordDict.end())
-			{
-				T[i] = true;
-				break;
-			}
-		}
-	}
-
-	return T[s.size()];
 }
 
 // 1143
@@ -1636,7 +1655,7 @@ int CurrentProblem(int n, vector<int>& ranges)
 
 void main()
 {
-	vector<int> a = { 1,2,5 };
+	vector<int> a = { 1,1,1,1,1 };
 	vector<int> a1 = { 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840,850,860,870,880,890,900,910,920,930,940,950,960,970,980,990,111 };
 	vector<int> a2 = { 1, 100, 1, 1, 1, 100, 1, 1, 100, 1 };
 	//vector<vector<char>> T
@@ -1678,5 +1697,5 @@ void main()
 	node->next->next->next->next = &ListNode(5);
 	node->next->next->next->next->next = node->next->next;
 
-	cout << canPartition(a) << endl;
+	cout << findTargetSumWays(a, 3) << endl;
 }

@@ -938,7 +938,6 @@ int combinationSum4(vector<int>& nums, int target)
 	int n = nums.size();
 	vector<int> T(target + 1, 0);
 	T[0] = 1;
-	//sort(nums.begin(), nums.end());
 
 	for (int i = 1; i <= target; ++i)
 	{
@@ -955,7 +954,30 @@ int combinationSum4(vector<int>& nums, int target)
 // 416 **
 bool canPartition(vector<int>& nums)
 {
-	return false;
+	int sum = 0;
+	for (auto n : nums)
+		sum += n;
+	if ((sum & 1) == 1) return false;
+	sum /= 2;
+	int n = nums.size();
+	vector<vector<bool>> T(n + 1, vector<bool>(sum + 1, false));
+	for (int i = 0; i <= n; ++i)
+		T[i][0] = true;
+
+	for (int i = 1; i <= n; ++i)
+	{
+		for (int j = 1; j <= sum; ++j)
+		{
+			// T[i][j] = T[i - 1][j] || T[i - 1][j - nums[i]]
+			T[i][j] = T[i - 1][j];
+			if (j >= nums[i - 1])
+				T[i][j] = T[i][j] || T[i - 1][j - nums[i - 1]];
+		}
+	}
+
+	printDPTable(T);
+
+	return T[n][sum];
 }
 
 // 72
@@ -1614,7 +1636,7 @@ int CurrentProblem(int n, vector<int>& ranges)
 
 void main()
 {
-	vector<int> a = { 0,1,0,2,1,0,1,3,2,1,2,1 };
+	vector<int> a = { 1,2,5 };
 	vector<int> a1 = { 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840,850,860,870,880,890,900,910,920,930,940,950,960,970,980,990,111 };
 	vector<int> a2 = { 1, 100, 1, 1, 1, 100, 1, 1, 100, 1 };
 	//vector<vector<char>> T
@@ -1656,5 +1678,5 @@ void main()
 	node->next->next->next->next = &ListNode(5);
 	node->next->next->next->next->next = node->next->next;
 
-	cout << combinationSum4(a1, 999) << endl;
+	cout << canPartition(a) << endl;
 }

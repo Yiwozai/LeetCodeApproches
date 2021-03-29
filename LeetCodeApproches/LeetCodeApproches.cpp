@@ -912,12 +912,6 @@ int subarrayBitwiseORs(vector<int>& arr)
 	return 0;
 }
 
-// 416
-bool canPartition(vector<int>& nums)
-{
-	return false;
-}
-
 #pragma endregion
 
 #pragma region Double
@@ -938,7 +932,7 @@ int coinChange(vector<int>& coins, int amount)
 	return T[amount] > amount ? -1 : T[amount];
 }
 
-// 377
+// 377 **
 int combinationSum4(vector<int>& nums, int target)
 {
 	int n = nums.size();
@@ -956,6 +950,12 @@ int combinationSum4(vector<int>& nums, int target)
 	}
 
 	return T.back();
+}
+
+// 416 **
+bool canPartition(vector<int>& nums)
+{
+	return false;
 }
 
 // 72
@@ -1046,7 +1046,7 @@ int findLength(vector<int>& A, vector<int>& B)
 // 10
 bool isMatch(string s, string p)
 {
-
+	return false;
 }
 
 #pragma endregion

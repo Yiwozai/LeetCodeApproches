@@ -441,6 +441,7 @@ int climbStairs(int n)
 }
 
 // 53
+// O(n^2) 优化到 O(n)
 int maxSubArray(vector<int>& nums)
 {
 	int length = nums.size();
@@ -566,6 +567,37 @@ int nthUglyNumber(int n)
 	}
 
 	return T[n - 1];
+}
+
+// 1326 **
+// O(n^3) 优化到 O(n^2)
+int minTaps(int n, vector<int>& ranges)
+{
+	//vector<vector<int>> T(n + 1, vector<int>(n + 1, 0));
+
+	//for (int right = 0; right <= n; ++right)
+	//{
+	//	for (int left = right; left >= 0; --left)
+	//	{
+	//		for (int i = left; i <= right; ++i)
+	//		{
+
+	//		}
+	//	}
+	//}
+
+	vector<int> T(n + 1, n + 2);
+	T[0] = 0;
+
+	for (int i = 0; i <= n; ++i)
+	{
+		for (int j = max(0, i - ranges[i]); j <= min(n, i + ranges[i]); ++j)
+		{
+			T[j] = min(T[j], T[max(0, i - ranges[i])] + 1);
+		}
+	}
+
+	return T[n] == n + 2 ? -1 : T[n];
 }
 
 // 174 ***
@@ -802,18 +834,6 @@ int maxCoins(vector<int>& nums)
 
 	vector<vector<int>> T(n + 2, vector<int>(n + 2, 0));
 
-	//for (int len = 1; len <= n; ++len)
-	//{
-	//	for (int left = 1; left <= n - len + 1; ++left)
-	//	{
-	//		int right = left + len - 1;
-	//		for (int k = left; k <= right; ++k)
-	//		{
-	//			T[left][right] = max(T[left][right], T[left][k - 1] + (nums[left - 1] * nums[k] * nums[right + 1]) + T[k + 1][right]);
-	//		}
-	//	}
-	//}
-
 	for (int r = 1; r <= n; ++r)
 	{
 		for (int l = r; l > 0; --l)
@@ -1020,6 +1040,13 @@ int findLength(vector<int>& A, vector<int>& B)
 	printDPTable(T);
 
 	return res;
+}
+
+// TODO
+// 10
+bool isMatch(string s, string p)
+{
+
 }
 
 #pragma endregion
@@ -1569,27 +1596,20 @@ void rotate(vector<vector<int>>& matrix)
 
 #pragma endregion
 
-int CurrentProblem(vector<int>& nums)
+int CurrentProblem(int n, vector<int>& ranges)
 {
-	int n = nums.size();
-	nums.insert(nums.begin(), 1), nums.push_back(1);
-	vector<vector<int>> T(n + 2, vector<int>(n + 2, 0));
+	vector<int> T(n + 1, n + 2);
+	T[0] = 0;
 
-	for (int r = 1; r <= n; ++r)
+	for (int i = 0; i <= n; ++i)
 	{
-		for (int l = r; l > 0; --l)
+		for (int j = max(0, i - ranges[i]); j <= min(n, i + ranges[i]); ++j)
 		{
-			for (int i = l; i <= r; ++i)
-			{
-				//cout << "left: " << l << "    right: " << r << "    i: " << i << "    res: " << T[l][i - 1] + nums[l - 1] * nums[i] * nums[r + 1] + T[i + 1][r] << endl;
-				T[l][r] = max(T[l][r], T[l][i - 1] + nums[l - 1] * nums[i] * nums[r + 1] + T[i + 1][r]);
-			}
-
-			//cout << "left: " << l << "    right: " << r << "    max: " << T[l][r] << '\n' << endl;
+			T[j] = min(T[j], T[max(0, i - ranges[i])] + 1);
 		}
 	}
 
-	return T[1][n];
+	return T[n] == n + 2 ? -1 : T[n];
 }
 
 void main()

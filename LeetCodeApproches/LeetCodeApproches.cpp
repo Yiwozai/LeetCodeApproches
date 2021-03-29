@@ -568,7 +568,7 @@ int nthUglyNumber(int n)
 	return T[n - 1];
 }
 
-// 174 
+// 174 ***
 int calculateMinimumHP(vector<vector<int>>& dungeon)
 {
 #pragma region Wrong Answer
@@ -892,6 +892,12 @@ int subarrayBitwiseORs(vector<int>& arr)
 	return 0;
 }
 
+// 416
+bool canPartition(vector<int>& nums)
+{
+	return false;
+}
+
 #pragma endregion
 
 #pragma region Double
@@ -910,6 +916,26 @@ int coinChange(vector<int>& coins, int amount)
 	}
 
 	return T[amount] > amount ? -1 : T[amount];
+}
+
+// 377
+int combinationSum4(vector<int>& nums, int target)
+{
+	int n = nums.size();
+	vector<int> T(target + 1, 0);
+	T[0] = 1;
+	//sort(nums.begin(), nums.end());
+
+	for (int i = 1; i <= target; ++i)
+	{
+		for (auto n : nums)
+		{
+			if (n <= i)
+				T[i] += T[i - n];
+		}
+	}
+
+	return T.back();
 }
 
 // 72
@@ -1569,7 +1595,7 @@ int CurrentProblem(vector<int>& nums)
 void main()
 {
 	vector<int> a = { 0,1,0,2,1,0,1,3,2,1,2,1 };
-	vector<int> a1 = { 1,2,3,2,1 };
+	vector<int> a1 = { 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840,850,860,870,880,890,900,910,920,930,940,950,960,970,980,990,111 };
 	vector<int> a2 = { 1, 100, 1, 1, 1, 100, 1, 1, 100, 1 };
 	//vector<vector<char>> T
 	//{
@@ -1610,5 +1636,5 @@ void main()
 	node->next->next->next->next = &ListNode(5);
 	node->next->next->next->next->next = node->next->next;
 
-	cout << calculateMinimumHP(b) << endl;
+	cout << combinationSum4(a1, 999) << endl;
 }

@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <stack>
 #include <math.h>
 #include <numeric>
 #include <algorithm>
@@ -49,19 +50,6 @@ void printVectorString(vector<string>&& S)
 	cout << '\n' << endl;
 }
 
-void printDPTable(vector<vector<int>>&& T)
-{
-	for (auto a : T)
-	{
-		for (auto b : a)
-		{
-			cout << b << "\t";
-		}
-		cout << '\n' << endl;
-	}
-	cout << '\n';
-}
-
 void printDoubleDPTable(vector<int> T1, vector<int> T2)
 {
 	if (T1.size() != T2.size()) return;
@@ -92,6 +80,44 @@ void printDoubleDPTable(vector<vector<int>> T1, vector<vector<int>> T2)
 	}
 
 	cout << endl;
+}
+
+void printDPTable(vector<int>& T)
+{
+	int n = T.size();
+
+	for (int i = 0; i < n; ++i)
+		cout << i << "\t";
+	cout << "\n" << endl;
+
+	for (auto t : T)
+		cout << t << "\t";
+
+	cout << '\n' << endl;
+	cout << '\n' << endl;
+}
+
+void printDPTable(vector<bool>& T)
+{
+	int n = T.size();
+
+	for (int i = 0; i < n; ++i)
+		cout << i << "\t";
+	cout << "\n" << endl;
+
+	for (auto t : T)
+	{
+		string s;
+		if (t)
+			s = "true";
+		else
+			s = "false";
+
+		cout << s << "\t";
+	}
+
+	cout << '\n' << endl;
+	cout << '\n' << endl;
 }
 
 void printDPTable(vector<vector<bool>>& T)
@@ -849,6 +875,7 @@ int coinChange(vector<int>& coins, int amount)
 }
 
 // 377 **
+// 数组中不必连续地选取n个数，使和为目标值。每个数都可以重复使用
 int combinationSum4(vector<int>& nums, int target)
 {
 	int n = nums.size();
@@ -862,6 +889,89 @@ int combinationSum4(vector<int>& nums, int target)
 			if (n <= i)
 				T[i] += T[i - n];
 		}
+
+		printDPTable(T);
+	}
+
+	
+	// 这已经默认有序排列了：
+	// 当计算目标值为3，2与1组合一定是先用1在用2.
+	// 因为遍历nums是有序的。
+	//for (auto num : nums)
+	//{
+	//	for (int i = num; i <= target; ++i)
+	//		T[i] += T[i - num];
+
+	//	cout << num << "  ->  " << target << endl;
+	//	printDPTable(T);
+	//}
+
+	return T.back();
+}
+
+// 494 **
+// 数组中不必连续地选取n个数，使和为目标值。每个数只能使用一次
+// 输出选取方法总和数
+int findTargetSumWays(vector<int>& nums, int S)
+{
+	int sum = accumulate(nums.begin(), nums.end(), 0);
+	if (S > sum || S < -sum || ((sum + S) & 1) == 1 ) return 0;
+	int target = (sum + S) / 2;
+
+	vector<int> T(target + 1, 0);
+	T[0] = 1;
+
+	for (auto num : nums)
+	{
+		for (int i = target; i >= num; --i)
+		{
+			T[i] += T[i - num];
+		}
+
+		cout << target << "  ->  " << num << endl;
+		printDPTable(T);
+	}
+
+	return T.back();
+}
+
+// 416 **
+// 数组中不必连续地选取n个数，使和为目标值。每个数只能使用一次
+// 输出是否有选取方法
+bool canPartition(vector<int>& nums)
+{
+	int sum = accumulate(nums.begin(), nums.end(), 0);
+	if ((sum & 1) == 1) return false;
+	sum >>= 1;
+
+	//int n = nums.size();
+	//vector<vector<bool>> T(n + 1, vector<bool>(sum + 1, false));
+	//for (int i = 0; i <= n; ++i)
+	//	T[i][0] = true;
+	//for (int i = 1; i <= n; ++i)
+	//{
+	//	for (int j = 1; j <= sum; ++j)
+	//	{
+	//		T[i][j] = T[i - 1][j];
+	//		if (j >= nums[i - 1])
+	//			T[i][j] = T[i][j] || T[i - 1][j - nums[i - 1]];
+	//	}
+	//}
+	//return T[n][sum];
+
+	// Space: O(n*m) -> O(m)
+	vector<bool> T(sum + 1, false);
+	T[0] = true;
+
+	for (int num : nums)
+	{
+		for (int i = sum; i >= num; --i)
+		{
+			T[i] = T[i] || T[i - num];
+		}
+
+		cout << sum << "  ->  " << num << endl;
+		printDPTable(T);
 	}
 
 	return T.back();
@@ -880,35 +990,6 @@ int numSquares(int n)
 			T[i] = min(T[i], T[i - j * j] + 1);
 
 	return T[n];
-}
-
-// 416 **
-bool canPartition(vector<int>& nums)
-{
-	int sum = 0;
-	for (auto n : nums)
-		sum += n;
-	if ((sum & 1) == 1) return false;
-	sum /= 2;
-	int n = nums.size();
-	vector<vector<bool>> T(n + 1, vector<bool>(sum + 1, false));
-	for (int i = 0; i <= n; ++i)
-		T[i][0] = true;
-
-	for (int i = 1; i <= n; ++i)
-	{
-		for (int j = 1; j <= sum; ++j)
-		{
-			// T[i][j] = T[i - 1][j] || T[i - 1][j - nums[i]]
-			T[i][j] = T[i - 1][j];
-			if (j >= nums[i - 1])
-				T[i][j] = T[i][j] || T[i - 1][j - nums[i - 1]];
-		}
-	}
-
-	printDPTable(T);
-
-	return T[n][sum];
 }
 
 // 312 ***
@@ -999,24 +1080,6 @@ int subarrayBitwiseORs(vector<int>& arr)
 	return 0;
 }
 
-// 494
-int findTargetSumWays(vector<int>& nums, int S)
-{
-	int n = nums.size();
-	vector<vector<int>> T(n + 1, vector<int>(2001, 0));
-	T[0][0] = 1;  // XXX
-
-	for (int i = 1; i <= n; ++i)
-	{
-		for (int j = 0; j <= 2001; ++j)
-		{
-			T[i][j] += (j - nums[i - 1] > 0 ? T[i - 1][j - nums[i - 1]] : 0)
-				+ (j + nums[i - 1] < 2000 ? T[i - 1][j + nums[i - 1]] : 0);
-		}
-	}
-
-	return T[n][S + 1001];
-}
 
 #pragma endregion
 
@@ -1094,7 +1157,7 @@ bool isMatch(string s, string p)
 
 #pragma endregion
 
-#pragma region Array and List
+#pragma region Array and List and Hash Table
 
 // 2
 ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
@@ -1206,6 +1269,61 @@ ListNode* reverseList(ListNode* head)
 	}
 
 	return prev;
+}
+
+// 560 **
+int subarraySum(vector<int>& nums, int k)
+{
+	// DP
+	//int n = nums.size();
+	//vector<int> sums(n, 0);
+	//sums[0] = nums[0];
+	//for (int i = 1; i < n; ++i)
+	//	sums[i] = sums[i - 1] + nums[i];
+
+	//int length = 0;
+	//for (int i = 0; i < n; ++i)
+	//{
+	//	for (int j = i; j >= 0; --j)
+	//	{
+	//		
+	//		if (sums[i] - sums[j] == k)
+	//			length = min(length, i - j + 1);
+	//	}
+	//}
+	//return length;
+
+	int sum = 0, result = 0;
+	unordered_map<int, int> preSum;
+	preSum[0] = 1;
+
+	for (int i = 0; i < nums.size(); ++i)
+	{
+		sum += nums[i];
+		auto it = preSum.find(sum - k);
+		if (it != preSum.end())
+			result += it->second;
+
+		it = preSum.find(sum);
+		preSum[sum] = (it == preSum.end() ? 0 : it->second) + 1;
+	}
+
+	return result;
+}
+
+#pragma endregion
+
+#pragma region LinkedList
+
+// 23
+ListNode* mergeKLists(vector<ListNode*>& lists)
+{
+	if (lists.empty()) return nullptr;
+	if (lists.size() == 1) return lists[0];
+}
+ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
+{
+	return nullptr;
 }
 
 #pragma endregion
@@ -1606,20 +1724,22 @@ public:
 
 #pragma region Math
 
-#pragma region LinkedLists
-
-// 23
-ListNode* mergeKLists(vector<ListNode*>& lists) 
+// 7
+int reverse(int x)
 {
-	if (lists.empty()) return nullptr;
-	if (lists.size() == 1) return lists[0];
-}
-ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
-{
-	return nullptr;
-}
+	int prevRec = 0, rev = 0;
 
-#pragma endregion
+	while (x != 0)
+	{
+		rev = rev * 10 + x % 10;
+		if ((rev - x % 10) / 10 != prevRec)
+			return 0;
+		prevRec = rev;
+		x /= 10;
+	}
+
+	return rev;
+}
 
 // 48
 void rotate(vector<vector<int>>& matrix)
@@ -1637,26 +1757,44 @@ void rotate(vector<vector<int>>& matrix)
 
 #pragma endregion
 
-int CurrentProblem(int n, vector<int>& ranges)
+int CurrentProblem(vector<vector<char>>& matrix)
 {
-	vector<int> T(n + 1, n + 2);
-	T[0] = 0;
+	int n = matrix.size();
+	if (n == 0) return 0;
+	int m = matrix[0].size();
 
-	for (int i = 0; i <= n; ++i)
+	vector<vector<int>> T(n + 1, vector<int>(m + 1, 0));
+	for (int i = 1; i <= n; ++i)
 	{
-		for (int j = max(0, i - ranges[i]); j <= min(n, i + ranges[i]); ++j)
+		for (int j = 1; j <= m; ++j)
 		{
-			T[j] = min(T[j], T[max(0, i - ranges[i])] + 1);
+			if (matrix[i - 1][j - 1] == '1')
+				T[i][j] = T[i][j - 1] + 1;
 		}
 	}
 
-	return T[n] == n + 2 ? -1 : T[n];
+	int result = 0;
+	for (int i = 1; i <= n; ++i)
+	{
+		for (int j = 1; j <= m; ++j)
+		{
+			int len = INT_MAX;
+
+			for (int k = i; k <= n; ++k)
+			{
+				len = min(len, T[k][j]);
+				result = max(result, (k - i + 1) * len);
+			}
+		}
+	}
+
+	return result;
 }
 
 void main()
 {
-	vector<int> a = { 1,1,1,1,1 };
-	vector<int> a1 = { 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840,850,860,870,880,890,900,910,920,930,940,950,960,970,980,990,111 };
+	vector<int> a = { 1,2,3 };
+	vector<int> a1 = { 10,20,30 };
 	vector<int> a2 = { 1, 100, 1, 1, 1, 100, 1, 1, 100, 1 };
 	//vector<vector<char>> T
 	//{
@@ -1679,7 +1817,7 @@ void main()
 		{-3, -3, -3},
 	};
 	vector<string> c{ "Leet", "Code" };
-	string s1 = "a";
+	string s1 = "asdsadag";
 	string s2 = "b";
 
 	TreeNode *root = &TreeNode(1);
@@ -1697,5 +1835,5 @@ void main()
 	node->next->next->next->next = &ListNode(5);
 	node->next->next->next->next->next = node->next->next;
 
-	cout << findTargetSumWays(a, 3) << endl;
+	cout << combinationSum4(a, 4) << endl;
 }

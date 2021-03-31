@@ -184,6 +184,18 @@ int binarySearch(vector<int>& nums, int target)
 	return -1;
 }
 
+bool canDevide3(int n)
+{
+	int sum = 0;
+	while (n != 0)
+	{
+		sum += (n % 10);
+		n /= 10;
+	}
+
+	return sum % 3 == 0;
+}
+
 #pragma region Sort
 
 // 快排
@@ -853,6 +865,21 @@ bool wordBreak(string s, vector<string>& wordDict)
 
 	return T[s.size()];
 }
+
+// 1553
+class NOrangesSolution {
+public:
+	unordered_map<int, int> dp;
+	int minDays(int n) {
+		if (n <= 1)
+			return n;
+
+		if (dp.count(n) == 0)
+			dp[n] = 1 + min(n % 2 + minDays(n / 2), n % 3 + minDays(n / 3));
+
+		return dp[n];
+	}
+};
 
 #pragma endregion
 
@@ -1835,5 +1862,5 @@ void main()
 	node->next->next->next->next = &ListNode(5);
 	node->next->next->next->next->next = node->next->next;
 
-	cout << combinationSum4(a, 4) << endl;
+	cout << NOrangesSolution().minDays(56) << endl;
 }

@@ -1804,42 +1804,6 @@ void rotate(vector<vector<int>>& matrix)
 
 #pragma endregion
 
-class TheHeap
-{
-	vector<int> nums;
-	int size;
-
-	TheHeap(vector<int> data)
-	{
-
-	}
-
-	void heapify(int index)
-	{
-		/*root = 5;
-		left = 4;
-		right = 7;*/
-
-		// nums[0].swap(nums[nums.size() - 1])
-
-		//heapify(right);
-	}
-
-	void push(int num)
-	{
-		++size;
-		nums.push_back(num);
-		heapify(nums.size());
-	}
-
-	void pop()
-	{
-		--size;
-		nums.erase(nums.begin());
-		heapify(0);
-	}
-};
-
 vector<int> CurrentProblem(vector<int>& nums)
 {
 	priority_queue<int> q;
@@ -1902,4 +1866,11 @@ void main()
 	node->next->next->next->next->next = node->next->next;
 
 	cout << findTargetSumWays(a, 1) << endl;
+
+	// 网易一面
+	//1. map，unordered_map；哪种占用内存更大；unordered_map扩容与删除。
+	//2. vector扩容；append平均时间复杂度。
+	//3. 1 - 1000寻找缺失的数；数组无序情况怎么做。
+	//4. TopK；内存不够的情况；有满分的情况。
+	//5. 口述A*；cost函数怎么定义；NavMesh怎么寻路的；其他寻路算法。
 }

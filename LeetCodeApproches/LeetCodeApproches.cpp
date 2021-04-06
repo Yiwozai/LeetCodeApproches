@@ -959,6 +959,21 @@ int findTargetSumWays(vector<int>& nums, int S)
 		printDPTable(T);
 	}
 
+	// Wrong
+	// 这样默认数字可以交换位置，但题目表述来看是有序的
+	//for (int i = 1; i <= target; ++i)
+	//{
+	//	for (int num : nums)
+	//	{
+	//		if (num <= i)
+	//			T[i] += T[i - num];
+
+	//		//cout << target << "  ->  " << num << endl;
+	//		printDPTable(T);
+	//	}
+	//}
+
+
 	return T.back();
 }
 
@@ -1107,6 +1122,11 @@ int subarrayBitwiseORs(vector<int>& arr)
 	return 0;
 }
 
+// 39
+vector<vector<int>> combinationSum(vector<int>& candidates, int target)
+{
+	return vector<vector<int>>();
+}
 
 #pragma endregion
 
@@ -1784,43 +1804,62 @@ void rotate(vector<vector<int>>& matrix)
 
 #pragma endregion
 
-int CurrentProblem(vector<vector<char>>& matrix)
+class TheHeap
 {
-	int n = matrix.size();
-	if (n == 0) return 0;
-	int m = matrix[0].size();
+	vector<int> nums;
+	int size;
 
-	vector<vector<int>> T(n + 1, vector<int>(m + 1, 0));
-	for (int i = 1; i <= n; ++i)
+	TheHeap(vector<int> data)
 	{
-		for (int j = 1; j <= m; ++j)
-		{
-			if (matrix[i - 1][j - 1] == '1')
-				T[i][j] = T[i][j - 1] + 1;
-		}
+
 	}
 
-	int result = 0;
-	for (int i = 1; i <= n; ++i)
+	void heapify(int index)
 	{
-		for (int j = 1; j <= m; ++j)
-		{
-			int len = INT_MAX;
+		/*root = 5;
+		left = 4;
+		right = 7;*/
 
-			for (int k = i; k <= n; ++k)
-			{
-				len = min(len, T[k][j]);
-				result = max(result, (k - i + 1) * len);
-			}
-		}
+		// nums[0].swap(nums[nums.size() - 1])
+
+		//heapify(right);
 	}
 
-	return result;
+	void push(int num)
+	{
+		++size;
+		nums.push_back(num);
+		heapify(nums.size());
+	}
+
+	void pop()
+	{
+		--size;
+		nums.erase(nums.begin());
+		heapify(0);
+	}
+};
+
+vector<int> CurrentProblem(vector<int>& nums)
+{
+	priority_queue<int> q;
+	for (auto num : nums)
+		q.push(num);
+
+	vector<int> res;
+
+	for (int i = 1; i <= 100; ++i)
+	{
+		res.push_back(q.top());
+		q.pop();
+	}
+
+	return res;
 }
 
 void main()
 {
-	vector<int> a = { 1,2,3 };
+	vector<int> a = { 1,1,1 };
 	vector<int> a1 = { 10,20,30 };
 	vector<int> a2 = { 1, 100, 1, 1, 1, 100, 1, 1, 100, 1 };
 	//vector<vector<char>> T
@@ -1862,5 +1901,5 @@ void main()
 	node->next->next->next->next = &ListNode(5);
 	node->next->next->next->next->next = node->next->next;
 
-	cout << NOrangesSolution().minDays(56) << endl;
+	cout << findTargetSumWays(a, 1) << endl;
 }

@@ -951,6 +951,7 @@ int findTargetSumWays(vector<int>& nums, int S)
 	for (auto num : nums)
 	{
 		for (int i = target; i >= num; --i)
+		//for (int i = num; i <= target; ++i)  // wrong
 		{
 			T[i] += T[i - num];
 		}
@@ -1607,14 +1608,6 @@ public:
 	}
 };
 
-//for (int i = 0; i < n; ++i)
-//{
-//	if (!available()) continue;	// 剪枝
-//	put();	// 放置
-//	fill(); // 进入
-//	back(); // 回退
-//}
-
 // 79
 class WordSearchSolution {
 public:
@@ -1657,6 +1650,20 @@ public:
 
 private:
 	int n, m;
+};
+
+// 200
+class IslandsNumberSolution {
+public:
+	int numIslands(vector<vector<char>>& grid) 
+	{
+
+	}
+
+	void find(vector<vector<char>>& grid, int i, int j)
+	{
+
+	}
 };
 
 // 526
@@ -1868,11 +1875,11 @@ void main()
 	cout << findTargetSumWays(a, 1) << endl;
 
 	// 网易一面 60min
-	//1. map，unordered_map；哪种占用内存更大；unordered_map扩容与删除。
+	//1. map和unordered_map；哪种占用内存更大；unordered_map扩容与删除。
 	//2. vector扩容；push_back平均时间复杂度。
-	//3. 有序的1到1000寻找缺失的数；无序情况怎么做。
+	//3. 有序的1到1000寻找缺失的一个数；无序情况怎么做。
 	//4. TopK；内存不够的情况；有满分的情况。
-	//5. 口述A*；cost函数怎么定义；NavMesh怎么寻路的；其他寻路算法。
+	//5. 说说A*；cost函数怎么定义；NavMesh怎么寻路；其他寻路算法。
 
 	// 紫龙一面 30min
 	//1. vector；怎么插入；怎么扩容。
@@ -1883,7 +1890,7 @@ void main()
 	//6. c# GC。
 	//7. 二叉树遍历；递归怎么改成循环。
 	//8. 向量点乘与叉乘；举例使用时机。
-	//9. 变换矩阵为什么是4x4；一般是（0, 0, 0, 1）的那一列\行什么作用。
+	//9. 变换矩阵为什么是4x4；一般是（0, 0, 0, 1）的最后一列\行什么作用。
 	//10. 一个顶点经历哪些空间与变换才会到屏幕上。
 	//11. BlinnPhong光照模型；n点乘l和n点乘h意义。
 	//12. shadowmap过程；shadowmap问题与解决方案；照向四面八方的点光源怎么生成shadowmap。

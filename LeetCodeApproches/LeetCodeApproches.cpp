@@ -1874,14 +1874,14 @@ void main()
 
 	cout << findTargetSumWays(a, 1) << endl;
 
-	// 网易一面 60min
+	// 网易一面 4.6 60min
 	//1. map和unordered_map；哪种占用内存更大；unordered_map扩容与删除。
 	//2. vector扩容；push_back平均时间复杂度。
 	//3. 有序的1到1000寻找缺失的一个数；无序情况怎么做。
 	//4. TopK；内存不够的情况；有满分的情况。
 	//5. 说说A*；cost函数怎么定义；NavMesh怎么寻路；其他寻路算法。
 
-	// 紫龙一面 30min
+	// 紫龙一面 4.6 30min
 	//1. vector；怎么插入；怎么扩容。
 	//2. map与unordered_map；什么时候用哪个。
 	//3. static关键字；修饰函数中一临时变量时，多久生成、多久销毁。
@@ -1896,4 +1896,14 @@ void main()
 	//12. shadowmap过程；shadowmap问题与解决方案；照向四面八方的点光源怎么生成shadowmap。
 	//13. 骨骼与蒙皮；蒙皮算法。
 	//14. 寻路算法；它们异同；说说A*。
+
+	// 莉莉丝一面 4.9 60min
+	// 同样没直接问八股文
+	// 1. 对于空间中多个点，最小AABB包围盒怎么生成；最小包围球怎么生成。
+	// 2. 欧拉角和Quaternion；对于一个正向物体，欧拉角怎么偏转到(x,y,z)固定角度；欧拉角怎么转化到矩阵。
+	// 3. string s; vector<string> v; v.emplace_back(std::move(s));
+	// 4. 跟随的人物转过墙角时，相机怎么运动。
+	// 5. 纹理映射。
+	// 6. 软体模拟。
+	// 7. 物理引擎了解吗，碰撞相关。
 }
